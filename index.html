@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interactive 3D Gesture Particle System</title>
+  <style>
+    body { margin:0; overflow:hidden; background:black; }
+    video { display:none; }
+  </style>
+</head>
+<body>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+<script>
+let scene, camera, renderer, particles, geometry;
+let particleCount = 5000;
+let currentShape = "heart";
+let expansion = 1;
+let handX = 0, handY = 0;
+
+init();
+initHandTracking();
+animate();
+
+function init() {
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+
+  renderer = new THREE.WebGLRenderer({ antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  createParticles("heart");
+}
+
+function createParticles(shape) {
+  if(particles) scene.remove(particles);
+
+  geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
+  const colors = new Float32Array(particleCount * 3);
+
+  for(let i=0; i<particleCount; i++){
+    let pos = getShapePosition(shape, i);
+    positions[i*3] = pos.x;
+    positions[i*3+1] = pos.y;
+    positions[i*3+2] = pos.z;
+
+    colors[i*3] = Math.random();
+    colors[i*3+1] = Math.random();
+    colors[i*3+2] = Math.random();
+  }
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  const material = new THREE.PointsMaterial({
+    size: 0.05,
+    vertexColors: true
+  });
+
+  particles = new THREE.Points(geometry, material);
+  scene.add(particles);
+}
+
+function getShapePosition(shape, i){
+  let t = Math.random() * Math.PI * 2;
+
+  if(shape === "heart"){
+    let x = 16 * Math.pow(Math.sin(t),3) / 20;
+    let y = (13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t))/20;
+    return {x, y, z:(Math.random()-0.5)};
+  }
+
+  if(shape === "flower"){
+    let r = Math.sin(6*t);
+    return {
+      x: r*Math.cos(t),
+      y: r*Math.sin(t),
+      z:(Math.random()-0.5)
+    };
+  }
+
+  if(shape === "saturn"){
+    let r = 1.5 + Math.random()*0.2;
+    return {
+      x: r*Math.cos(t),
+      y: (Math.random()-0.5)*0.3,
+      z: r*Math.sin(t)
+    };
+  }
+
+  if(shape === "fireworks"){
+    return {
+      x:(Math.random()-0.5)*3,
+      y:(Math.random()-0.5)*3,
+      z:(Math.random()-0.5)*3
+    };
+  }
+}
+
+function animate(){
+  requestAnimationFrame(animate);
+
+  particles.rotation.y += 0.01;
+
+  particles.scale.set(expansion, expansion, expansion);
+
+  particles.position.x = handX * 2;
+  particles.position.y = -handY * 2;
+
+  renderer.render(scene, camera);
+}
+
+/* ========================= */
+/*       HAND TRACKING       */
+/* ========================= */
+
+function initHandTracking(){
+  const videoElement = document.createElement("video");
+
+  const hands = new Hands({
+    locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+  });
+
+  hands.setOptions({
+    maxNumHands: 1,
+    minDetectionConfidence: 0.7,
+    minTrackingConfidence: 0.7
+  });
+
+  hands.onResults(results => {
+    if(results.multiHandLandmarks.length > 0){
+      const landmarks = results.multiHandLandmarks[0];
+
+      handX = landmarks[9].x - 0.5;
+      handY = landmarks[9].y - 0.5;
+
+      const thumb = landmarks[4];
+      const index = landmarks[8];
+
+      const dx = thumb.x - index.x;
+      const dy = thumb.y - index.y;
+      const distance = Math.sqrt(dx*dx + dy*dy);
+
+      expansion = 1 + (0.1 - distance) * 5;
+
+      if(distance < 0.05){
+        switchShape();
+      }
+
+      updateColors(distance);
+    }
+  });
+
+  const cameraFeed = new Camera(videoElement, {
+    onFrame: async () => {
+      await hands.send({image: videoElement});
+    },
+    width: 640,
+    height: 480
+  });
+
+  cameraFeed.start();
+}
+
+function switchShape(){
+  const shapes = ["heart","flower","saturn","fireworks"];
+  let index = shapes.indexOf(currentShape);
+  index = (index + 1) % shapes.length;
+  currentShape = shapes[index];
+  createParticles(currentShape);
+}
+
+function updateColors(distance){
+  const colors = geometry.attributes.color.array;
+  for(let i=0; i<particleCount; i++){
+    colors[i*3] = 1 - distance*5;
+    colors[i*3+1] = Math.random();
+    colors[i*3+2] = distance*5;
+  }
+  geometry.attributes.color.needsUpdate = true;
+}
+</script>
+
+</body>
+</html>
