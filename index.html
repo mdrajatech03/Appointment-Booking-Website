@@ -9,12 +9,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <!-- HTML2Canvas Library for Slip Download -->
+  <!-- HTML2Canvas Library for downloading slip -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
     :root {
-      --primary-color: #d4af37; /* Metallic Gold */
+      --primary-color: #d4af37; /* Gold theme */
       --secondary-color: #111111;
       --accent-color: #27ae60;
       --bg-color: #f8f9fa;
@@ -36,80 +36,74 @@
     .hero {
       background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&w=1350&q=80') center/cover;
       color: #fff;
-      padding: 70px 20px;
+      padding: 60px 20px;
       text-align: center;
       border-bottom: 3px solid var(--primary-color);
     }
 
     .hero h1 {
-      font-size: 42px;
+      font-size: 38px;
       font-weight: 700;
-      letter-spacing: 1px;
       color: var(--primary-color);
       margin-bottom: 8px;
     }
 
     .hero p {
-      font-size: 18px;
+      font-size: 16px;
       opacity: 0.9;
     }
 
     .container {
       width: 90%;
-      max-width: 1000px;
+      max-width: 900px;
       margin: auto;
-      padding: 40px 0;
+      padding: 30px 0;
     }
 
     .services-title {
       text-align: center;
-      margin-bottom: 25px;
-      font-size: 24px;
+      margin-bottom: 20px;
+      font-size: 22px;
       font-weight: 600;
     }
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 20px;
-      margin-bottom: 40px;
+      margin-bottom: 35px;
     }
 
     .card {
       background: #fff;
-      padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
       text-align: center;
       border: 1px solid #eee;
-      transition: transform 0.3s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-5px);
     }
 
     .card h3 {
-      font-size: 20px;
-      margin-bottom: 10px;
+      font-size: 18px;
+      margin-bottom: 8px;
     }
 
     .card p {
       color: #666;
-      font-size: 14px;
+      font-size: 13px;
     }
 
     .booking-box {
       background: #fff;
-      padding: 35px;
+      padding: 30px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
     }
 
     .booking-box h2 {
       margin-bottom: 20px;
       text-align: center;
-      font-size: 26px;
+      font-size: 24px;
     }
 
     .notice-banner {
@@ -126,16 +120,15 @@
     form {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 15px;
     }
 
     form input, form select {
-      padding: 14px;
+      padding: 12px 14px;
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 15px;
       outline: none;
-      transition: border-color 0.3s;
     }
 
     form input:focus, form select:focus {
@@ -147,11 +140,11 @@
     }
 
     .btn-submit {
-      padding: 16px;
+      padding: 15px;
       border: none;
       background: var(--secondary-color);
       color: var(--primary-color);
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
@@ -160,7 +153,6 @@
 
     .btn-submit:hover {
       background: #000;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     }
 
     /* PAYMENT MODAL STYLES */
@@ -169,7 +161,7 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.75);
       z-index: 1000;
       justify-content: center;
       align-items: center;
@@ -179,11 +171,10 @@
     .modal-content {
       background: #fff;
       width: 100%;
-      max-width: 480px;
+      max-width: 440px;
       border-radius: 16px;
       padding: 25px;
       text-align: center;
-      position: relative;
       animation: modalFadeIn 0.3s ease;
     }
 
@@ -192,24 +183,19 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .modal-content h3 {
-      margin-bottom: 10px;
-      font-size: 22px;
-    }
-
     .advance-tag {
       background: #fff3cd;
       color: #856404;
       padding: 8px 12px;
       border-radius: 6px;
       font-size: 13px;
-      margin-bottom: 15px;
+      margin: 10px 0 15px 0;
       display: inline-block;
       border: 1px solid #ffeeba;
     }
 
     .qr-container {
-      margin: 15px 0;
+      margin: 10px 0;
       padding: 10px;
       background: #fafafa;
       border: 2px dashed #ddd;
@@ -218,22 +204,21 @@
     }
 
     .qr-container img {
-      width: 200px;
-      height: 200px;
+      width: 190px;
+      height: 190px;
       object-fit: contain;
     }
 
     .upi-info {
       background: #f1f3f5;
-      padding: 12px;
+      padding: 10px;
       border-radius: 8px;
       font-size: 14px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     .upi-btn {
-      display: inline-block;
-      width: 100%;
+      display: block;
       padding: 12px;
       background: #007bff;
       color: #fff;
@@ -241,6 +226,7 @@
       border-radius: 8px;
       font-weight: 500;
       margin-bottom: 15px;
+      font-size: 14px;
     }
 
     .modal-actions {
@@ -257,24 +243,16 @@
       font-size: 15px;
     }
 
-    .btn-cancel {
-      background: #e0e0e0;
-      color: #333;
-    }
-
-    .btn-confirm {
-      background: var(--accent-color);
-      color: #fff;
-      font-weight: 600;
-    }
+    .btn-cancel { background: #e0e0e0; color: #333; }
+    .btn-confirm { background: var(--accent-color); color: #fff; font-weight: 600; }
 
     /* SLIP STYLES */
     .slip {
       display: none;
-      margin-top: 40px;
+      margin-top: 35px;
       background: #fff;
       border-radius: 16px;
-      padding: 30px;
+      padding: 25px;
       box-shadow: 0 8px 25px rgba(0,0,0,0.08);
       border: 2px solid var(--primary-color);
     }
@@ -282,23 +260,19 @@
     .slip-header {
       text-align: center;
       border-bottom: 2px dashed #ddd;
-      padding-bottom: 15px;
-      margin-bottom: 20px;
+      padding-bottom: 12px;
+      margin-bottom: 15px;
     }
 
     .slip-row {
       display: flex;
       justify-content: space-between;
-      margin: 12px 0;
-      font-size: 15px;
-    }
-
-    .slip-row strong {
-      color: #555;
+      margin: 10px 0;
+      font-size: 14px;
     }
 
     .btn-download {
-      margin-top: 20px;
+      margin-top: 15px;
       width: 100%;
       padding: 12px;
       background: #007bff;
@@ -306,20 +280,22 @@
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 15px;
+      font-weight: 500;
     }
 
     footer {
       background: var(--secondary-color);
       color: #fff;
       text-align: center;
-      padding: 25px;
-      margin-top: 60px;
+      padding: 20px;
+      margin-top: 50px;
+      font-size: 14px;
     }
 
     @media(max-width: 768px) {
       form { grid-template-columns: 1fr; }
-      .hero h1 { font-size: 32px; }
+      .hero h1 { font-size: 30px; }
       .booking-box { padding: 20px; }
     }
   </style>
@@ -339,27 +315,27 @@
       <div class="card">
         <i class="fa-solid fa-scissors fa-2x" style="color:var(--primary-color); margin-bottom:10px;"></i>
         <h3>Hair Cut</h3>
-        <p>Professional haircutting and modern styling</p>
+        <p>Professional haircutting & modern styling</p>
       </div>
 
       <div class="card">
         <i class="fa-solid fa-user-ninja fa-2x" style="color:var(--primary-color); margin-bottom:10px;"></i>
         <h3>Beard Cutting</h3>
-        <p>Precision beard trimming and shaping</p>
+        <p>Precision beard trimming & shaping</p>
       </div>
 
       <div class="card">
         <i class="fa-solid fa-crown fa-2x" style="color:var(--primary-color); margin-bottom:10px;"></i>
         <h3>Hair + Beard Combo</h3>
-        <p>Complete hair styling and beard care package</p>
+        <p>Complete hair styling & beard grooming</p>
       </div>
     </div>
 
     <div class="booking-box">
-      <h2>Book Your Appointment</h2>
+      <h2>Book Appointment</h2>
 
       <div class="notice-banner">
-        <i class="fa-solid fa-circle-info"></i> <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹49 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹49 aapke final shop bill se minus (deduct) ho jayenge.
+        <i class="fa-solid fa-circle-info"></i> <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹49 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹49 aapke final shop bill me se minus (deduct) ho jayenge.
       </div>
 
       <form id="bookingForm">
@@ -384,25 +360,28 @@
       <div class="slip" id="slip">
         <div class="slip-header">
           <h2 style="color:var(--primary-color);">Rohit Hair Cutting</h2>
-          <p style="font-size:13px; color:#666;">Appointment Confirmation Slip</p>
+          <p style="font-size:12px; color:#666;">Appointment Confirmation Slip</p>
         </div>
 
-        <div class="slip-row"><strong>Booking Reference ID:</strong> <span id="sRef"></span></div>
-        <div class="slip-row"><strong>Customer Name:</strong> <span id="sName"></span></div>
-        <div class="slip-row"><strong>Mobile Number:</strong> <span id="sMobile"></span></div>
+        <div class="slip-row"><strong>Booking ID:</strong> <span id="sRef"></span></div>
+        <div class="slip-row"><strong>Name:</strong> <span id="sName"></span></div>
+        <div class="slip-row"><strong>Mobile:</strong> <span id="sMobile"></span></div>
         <div class="slip-row"><strong>Address:</strong> <span id="sAddress"></span></div>
-        <div class="slip-row"><strong>Service Selected:</strong> <span id="sService"></span></div>
-        <div class="slip-row"><strong>Appointment Date:</strong> <span id="sDate"></span></div>
-        <div class="slip-row"><strong>Appointment Time:</strong> <span id="sTime"></span></div>
-        <hr style="margin:15px 0; border:0; border-top:1px dashed #ccc;">
-        <div class="slip-row"><strong>Advance Payment Paid:</strong> <span style="color:var(--accent-color); font-weight:bold;">₹49 (Paid)</span></div>
-        <div class="slip-row"><strong>UPI Transaction ID:</strong> <span id="sTransaction"></span></div>
-        <div class="slip-row"><strong style="color:#d9534f;">Shop Balance Status:</strong> <span>₹49 bill me se minus ho jayega</span></div>
+        <div class="slip-row"><strong>Service:</strong> <span id="sService"></span></div>
+        <div class="slip-row"><strong>Date:</strong> <span id="sDate"></span></div>
+        <div class="slip-row"><strong>Time:</strong> <span id="sTime"></span></div>
+        <hr style="margin:12px 0; border:0; border-top:1px dashed #ccc;">
+        <div class="slip-row"><strong>Advance Payment:</strong> <span style="color:var(--accent-color); font-weight:bold;">₹49 (Paid)</span></div>
+        <div class="slip-row"><strong>Transaction ID:</strong> <span id="sTransaction"></span></div>
+        <div class="slip-row"><strong style="color:#d9534f;">Shop Note:</strong> <span>₹49 bill me se minus ho jayega</span></div>
 
-        <hr style="margin:15px 0; border:0; border-top:1px dashed #ccc;">
-        <p style="font-size:13px; text-align:center; color:#555;"><strong>Shop Contact:</strong> 6209103454 | <strong>Email:</strong> rohitksharma3454@gmail.com</p>
+        <hr style="margin:12px 0; border:0; border-top:1px dashed #ccc;">
+        <p style="font-size:12px; text-align:center; color:#555;"><strong>Contact:</strong> 6209103454 | <strong>Email:</strong> rohitksharma3454@gmail.com</p>
 
-        <button class="btn-download" onclick="downloadSlip()"><i class="fa-solid fa-file-arrow-down"></i> Download Appointment Slip</button>
+        <button class="btn-download" onclick="downloadSlip()"><i class="fa-solid fa-file-arrow-down"></i> Download Slip Image</button>
+
+        <!-- Dynamic WhatsApp Link appended via JS -->
+        <div id="waContainer"></div>
       </div>
 
     </div>
@@ -414,12 +393,12 @@
     <div class="modal-content">
       <h3>Advance Prepayment</h3>
       <div class="advance-tag">
-        <i class="fa-solid fa-shield-halved"></i> ₹49 Service Charge (Shop par minus hoga)
+        <i class="fa-solid fa-shield-halved"></i> ₹49 Service Charge (Shop bill me minus hoga)
       </div>
 
       <div class="qr-container">
         <!-- Direct Dynamic UPI QR Code URL for ₹49 -->
-        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=upi://pay?pa=rohitkumar3454@ybl%26pn=Rohit%20Hair%20Cutting%26am=49%26cu=INR" alt="UPI Payment QR Code">
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=rohitkumar3454@ybl%26pn=Rohit%20Hair%20Cutting%26am=49%26cu=INR" alt="UPI Payment QR Code">
       </div>
 
       <div class="upi-info">
@@ -429,7 +408,7 @@
       <a id="directUpiBtn" href="#" class="upi-btn"><i class="fa-solid fa-mobile-screen-button"></i> Pay via UPI App (GPay / PhonePe)</a>
 
       <div style="text-align:left; margin-bottom:15px;">
-        <label style="font-size:13px; font-weight:600;">Payment karne ke baad UTR/Transaction ID yahan dalein:</label>
+        <label style="font-size:12px; font-weight:600;">Payment ke baad UTR / Transaction ID daalein:</label>
         <input type="text" id="transactionInput" placeholder="Enter 12-digit UPI Transaction ID" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-top:5px;" required>
       </div>
 
@@ -446,11 +425,10 @@
 
   <!-- FIREBASE INTEGRATION SCRIPT -->
   <script type="module">
-    // Firebase Modular SDK CDN Imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-    // TODO: Replace with your actual Firebase Project Configuration
+    // ⚠️ Apne Firebase Console se Ye Details Replace Karein
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -460,22 +438,18 @@
       appId: "YOUR_APP_ID"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Global Object to hold form data temporarily
     window.currentBookingData = {};
 
     const bookingForm = document.getElementById("bookingForm");
     const paymentModal = document.getElementById("paymentModal");
     const directUpiBtn = document.getElementById("directUpiBtn");
 
-    // Form submit event -> Open Payment Modal
     bookingForm.addEventListener("submit", function(e) {
       e.preventDefault();
 
-      // Collect inputs
       window.currentBookingData = {
         name: document.getElementById("name").value.trim(),
         mobile: document.getElementById("mobile").value.trim(),
@@ -485,20 +459,16 @@
         address: document.getElementById("address").value.trim()
       };
 
-      // Set direct UPI intent URL for mobile users
       const upiDeepLink = `upi://pay?pa=rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=49&cu=INR&tn=Advance%20Booking%20Fee`;
       directUpiBtn.href = upiDeepLink;
 
-      // Show Payment Modal
       paymentModal.style.display = "flex";
     });
 
-    // Close Modal
     window.closeModal = function() {
       paymentModal.style.display = "none";
     };
 
-    // Confirm Payment and Save to Firebase
     window.confirmBooking = async function() {
       const transactionId = document.getElementById("transactionInput").value.trim();
 
@@ -507,7 +477,6 @@
         return;
       }
 
-      // Add transaction ID and timestamp
       const finalData = {
         ...window.currentBookingData,
         advanceAmount: 49,
@@ -517,13 +486,10 @@
       };
 
       try {
-        // Save booking data to Firebase Firestore
         const docRef = await addDoc(collection(db, "appointments"), finalData);
         
-        // Hide Modal
         closeModal();
 
-        // Display Confirmation Slip
         document.getElementById("sRef").innerText = docRef.id;
         document.getElementById("sName").innerText = finalData.name;
         document.getElementById("sMobile").innerText = finalData.mobile;
@@ -533,23 +499,29 @@
         document.getElementById("sTime").innerText = finalData.time;
         document.getElementById("sTransaction").innerText = finalData.transactionId;
 
+        // Add 1-Click WhatsApp Send Button
+        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹49%0A*Transaction ID:* ${finalData.transactionId}`;
+        
+        document.getElementById("waContainer").innerHTML = `
+          <a href="https://wa.me/916209103454?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
+            <i class="fa-brands fa-whatsapp"></i> Send Slip to Shopkeeper on WhatsApp
+          </a>
+        `;
+
         document.getElementById("slip").style.display = "block";
         document.getElementById("slip").scrollIntoView({ behavior: 'smooth' });
 
-        // Trigger Email Notification via Mailto
         sendEmailNotification(finalData, docRef.id);
 
-        // Reset Form
         bookingForm.reset();
         document.getElementById("transactionInput").value = "";
 
       } catch (error) {
         console.error("Firebase Error: ", error);
-        alert("Booking process me error aayi: " + error.message);
+        alert("Booking me error aayi: " + error.message);
       }
     };
 
-    // Function to trigger mailto
     function sendEmailNotification(data, refId) {
       const subject = `New Appointment Confirmation - ${data.name}`;
       const body = `New Booking Details:\n\nReference ID: ${refId}\nName: ${data.name}\nMobile: ${data.mobile}\nService: ${data.service}\nDate: ${data.date}\nTime: ${data.time}\nAdvance Paid: ₹49\nTransaction ID: ${data.transactionId}\nAddress: ${data.address}`;
@@ -559,7 +531,6 @@
   </script>
 
   <script>
-    // Download Slip as Image Function
     function downloadSlip() {
       const slipElement = document.getElementById('slip');
       html2canvas(slipElement).then(canvas => {
