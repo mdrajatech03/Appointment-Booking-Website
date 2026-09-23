@@ -204,29 +204,46 @@
     }
 
     .qr-container img {
-      width: 190px;
-      height: 190px;
+      width: 180px;
+      height: 180px;
       object-fit: contain;
     }
 
-    .upi-info {
+    .upi-box {
       background: #f1f3f5;
-      padding: 10px;
+      padding: 10px 14px;
       border-radius: 8px;
-      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-bottom: 12px;
     }
 
-    .upi-btn {
-      display: block;
-      padding: 12px;
+    .copy-btn {
       background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .pay-options {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .pay-btn {
+      flex: 1;
+      padding: 10px;
+      background: #28a745;
       color: #fff;
       text-decoration: none;
       border-radius: 8px;
+      font-size: 13px;
       font-weight: 500;
-      margin-bottom: 15px;
-      font-size: 14px;
     }
 
     .modal-actions {
@@ -300,7 +317,6 @@
   </style>
 </head>
   
-
 <body>
 
   <section class="hero">
@@ -335,7 +351,7 @@
       <h2>Book Appointment</h2>
 
       <div class="notice-banner">
-        <i class="fa-solid fa-circle-info"></i> <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹49 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹49 aapke final shop bill me se minus (deduct) ho jayenge.
+        <i class="fa-solid fa-circle-info"></i> <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹1 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹1 aapke final shop bill me se minus (deduct) ho jayenge.
       </div>
 
       <form id="bookingForm">
@@ -372,9 +388,9 @@
         <div class="slip-row"><strong>Date:</strong> <span id="sDate"></span></div>
         <div class="slip-row"><strong>Time:</strong> <span id="sTime"></span></div>
         <hr style="margin:12px 0; border:0; border-top:1px dashed #ccc;">
-        <div class="slip-row"><strong>Advance Payment:</strong> <span style="color:var(--accent-color); font-weight:bold;">₹49 (Paid)</span></div>
+        <div class="slip-row"><strong>Advance Payment:</strong> <span style="color:var(--accent-color); font-weight:bold;">₹1 (Paid)</span></div>
         <div class="slip-row"><strong>Transaction ID:</strong> <span id="sTransaction"></span></div>
-        <div class="slip-row"><strong style="color:#d9534f;">Shop Note:</strong> <span>₹49 bill me se minus ho jayega</span></div>
+        <div class="slip-row"><strong style="color:#d9534f;">Shop Note:</strong> <span>₹1 bill me se minus ho jayega</span></div>
 
         <hr style="margin:12px 0; border:0; border-top:1px dashed #ccc;">
         <p style="font-size:12px; text-align:center; color:#555;"><strong>Contact:</strong> 6209103454 | <strong>Email:</strong> rohitksharma3454@gmail.com</p>
@@ -388,22 +404,28 @@
 
   </div>
 
+  <!-- Modal Payment Section -->
   <div class="modal-overlay" id="paymentModal">
     <div class="modal-content">
       <h3>Advance Prepayment</h3>
       <div class="advance-tag">
-        <i class="fa-solid fa-shield-halved"></i> ₹49 Service Charge (Shop bill me minus hoga)
+        <i class="fa-solid fa-shield-halved"></i> ₹1 Service Charge (Shop bill me minus hoga)
       </div>
 
+      <!-- QR Code -->
       <div class="qr-container">
-        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=rohitkumar3454@ybl%26pn=Rohit%20Hair%20Cutting%26am=49%26cu=INR" alt="UPI Payment QR Code">
+        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=rohitkumar3454@ybl%26pn=Rohit%20Hair%20Cutting%26am=1%26cu=INR" alt="UPI Payment QR Code">
       </div>
 
-      <div class="upi-info">
-        <strong>UPI ID:</strong> <span style="color:#007bff;">rohitkumar3454@ybl</span>
+      <!-- UPI ID with Copy Option -->
+      <div class="upi-box">
+        <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">rohitkumar3454@ybl</span></div>
+        <button class="copy-btn" onclick="copyUpiId()"><i class="fa-regular fa-copy"></i> Copy</button>
       </div>
 
-      <a id="directUpiBtn" href="#" class="upi-btn"><i class="fa-solid fa-mobile-screen-button"></i> Pay via UPI App (GPay / PhonePe)</a>
+      <div class="pay-options">
+        <a id="directUpiBtn" href="#" class="pay-btn"><i class="fa-solid fa-mobile-screen"></i> Pay via App</a>
+      </div>
 
       <div style="text-align:left; margin-bottom:15px;">
         <label style="font-size:12px; font-weight:600;">Payment ke baad UTR / Transaction ID daalein:</label>
@@ -418,24 +440,21 @@
   </div>
 
   <footer>
-    © 2026 Rohit Hair Cutting | All Rights Reserved
-    
     © 2026 Rohit Hair Cutting | All Rights Reserved 
-  | <a href="admin.html" style="color:var(--primary-color); text-decoration:none; margin-left:10px;">Admin Login</a>
+    | <a href="admin.html" style="color:var(--primary-color); text-decoration:none; margin-left:10px;">Admin Login</a>
   </footer>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ⚠️ Is jagah apni Firebase Keys paste karein
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
+      authDomain: "rohit-hair-cutting.firebaseapp.com",
+      projectId: "rohit-hair-cutting",
+      storageBucket: "rohit-hair-cutting.firebasestorage.app",
+      messagingSenderId: "184279547945",
+      appId: "1:184279547945:web:0d94e94a532e9e02fc5c38"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -459,9 +478,7 @@
         address: document.getElementById("address").value.trim()
       };
 
-      
-      const upiDeepLink = `upi://pay?pa=rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=49&cu=INR&tn=Advance%20Booking%20Fee`;
-      
+      const upiDeepLink = `upi://pay?pa=rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR`;
       directUpiBtn.href = upiDeepLink;
 
       paymentModal.style.display = "flex";
@@ -469,6 +486,12 @@
 
     window.closeModal = function() {
       paymentModal.style.display = "none";
+    };
+
+    window.copyUpiId = function() {
+      const upiId = document.getElementById("upiId").innerText;
+      navigator.clipboard.writeText(upiId);
+      alert("UPI ID Copied! Ab apne UPI app (PhonePe/GPay) me Pay to UPI ID karke ₹1 pay karein.");
     };
 
     window.confirmBooking = async function() {
@@ -481,7 +504,7 @@
 
       const finalData = {
         ...window.currentBookingData,
-        advanceAmount: 49,
+        advanceAmount: 1,
         transactionId: transactionId,
         paymentStatus: "Completed",
         createdAt: serverTimestamp()
@@ -501,7 +524,7 @@
         document.getElementById("sTime").innerText = finalData.time;
         document.getElementById("sTransaction").innerText = finalData.transactionId;
 
-        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹49%0A*Transaction ID:* ${finalData.transactionId}`;
+        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹1%0A*Transaction ID:* ${finalData.transactionId}`;
         
         document.getElementById("waContainer").innerHTML = `
           <a href="https://wa.me/916209103454?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
@@ -527,7 +550,7 @@
 
     function sendEmailNotification(data, refId) {
       const subject = `New Appointment Confirmation - ${data.name}`;
-      const body = `New Booking Details:\n\nReference ID: ${refId}\nName: ${data.name}\nMobile: ${data.mobile}\nService: ${data.service}\nDate: ${data.date}\nTime: ${data.time}\nAdvance Paid: ₹49\nTransaction ID: ${data.transactionId}\nAddress: ${data.address}`;
+      const body = `New Booking Details:\n\nReference ID: ${refId}\nName: ${data.name}\nMobile: ${data.mobile}\nService: ${data.service}\nDate: ${data.date}\nTime: ${data.time}\nAdvance Paid: ₹1\nTransaction ID: ${data.transactionId}\nAddress: ${data.address}`;
       
       window.location.href = `mailto:rohitksharma3454@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     }
@@ -553,54 +576,4 @@
   </script>
 
 </body>
-
-  
-<!-- Firebase SDK Setup -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-  // Aapki Firebase Config
-  const firebaseConfig = {
-    apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
-    authDomain: "rohit-hair-cutting.firebaseapp.com",
-    projectId: "rohit-hair-cutting",
-    storageBucket: "rohit-hair-cutting.firebasestorage.app",
-    messagingSenderId: "184279547945",
-    appId: "1:184279547945:web:0d94e94a532e9e02fc5c38"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  // Form submit event
-  const bookingForm = document.querySelector('form'); // apne form ki class/id ke hisab se change karein
-  if (bookingForm) {
-    bookingForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      
-      // Input values capture karein
-      const name = document.querySelector('#name').value;
-      const phone = document.querySelector('#phone').value;
-      const date = document.querySelector('#date').value;
-      const service = document.querySelector('#service').value;
-
-      try {
-        await addDoc(collection(db, "appointments"), {
-          name: name,
-          phone: phone,
-          date: date,
-          service: service,
-          createdAt: serverTimestamp()
-        });
-        alert("Appointment successful book ho gaya!");
-        bookingForm.reset();
-      } catch (error) {
-        console.error("Error booking appointment: ", error);
-        alert("Kuch error aaya, dobara try karein.");
-      }
-    });
-  }
-</script>
-  
-    </html>
+</html>
