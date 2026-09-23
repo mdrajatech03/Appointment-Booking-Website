@@ -211,6 +211,46 @@
   </style>
 </head>
 
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
+    authDomain: "rohit-hair-cutting.firebaseapp.com",
+    projectId: "rohit-hair-cutting",
+    storageBucket: "rohit-hair-cutting.firebasestorage.app",
+    messagingSenderId: "184279547945",
+    appId: "1:184279547945:web:0d94e94a532e9e02fc5c38"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const appointmentsList = document.querySelector('#appointments-list'); // Table/List ka container ID
+
+  // Real-time appointment fetch
+  const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+  onSnapshot(q, (snapshot) => {
+    if (appointmentsList) {
+      appointmentsList.innerHTML = "";
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        appointmentsList.innerHTML += `
+          <tr>
+            <td>${data.name}</td>
+            <td>${data.phone}</td>
+            <td>${data.service}</td>
+            <td>${data.date}</td>
+          </tr>
+        `;
+      });
+    }
+  });
+  </script>
+  
+
 <body>
 
   <div class="login-overlay" id="loginModal">
