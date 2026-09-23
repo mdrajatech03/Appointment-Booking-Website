@@ -228,8 +228,8 @@
     }
 
     .qr-container img {
-      width: 180px;
-      height: 180px;
+      width: 200px;
+      height: 200px;
       object-fit: contain;
     }
 
@@ -367,7 +367,7 @@
     </div>
 
     <div class="booking-box">
-      <h2>Book Appointment</h2>
+      ## Book Appointment
 
       <div class="notice-banner">
         <i class="fa-solid fa-circle-info"></i> <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹1 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹1 aapke final shop bill me se minus ho jayega.
@@ -419,7 +419,6 @@
         </div>
 
         <div class="slip-row"><strong>Booking ID:</strong> <span id="sRef"></span></div>
-        <div class="slip-row"><strong>Payment Note Ref:</strong> <span id="sNoteRef" style="color:#0d6efd; font-weight:bold;"></span></div>
         <div class="slip-row"><strong>Name:</strong> <span id="sName"></span></div>
         <div class="slip-row"><strong>Mobile:</strong> <span id="sMobile"></span></div>
         <div class="slip-row"><strong>Address:</strong> <span id="sAddress"></span></div>
@@ -427,8 +426,7 @@
         <div class="slip-row"><strong>Date:</strong> <span id="sDate"></span></div>
         <div class="slip-row"><strong>Time:</strong> <span id="sTime"></span></div>
         <hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">
-        <div class="slip-row"><strong>Advance Payment:</strong> <span style="color:var(--accent-color); font-weight:bold;">₹1 (Paid)</span></div>
-        <div class="slip-row"><strong>Transaction ID:</strong> <span id="sTransaction"></span></div>
+        <div class="slip-row"><strong>Advance Payment:</strong> <span style="color:var(--accent-color); font-weight:bold;">₹1 (Confirmed)</span></div>
         <div class="slip-row"><strong style="color:#d9534f;">Shop Note:</strong> <span>₹1 bill me se minus ho jayega</span></div>
 
         <hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">
@@ -446,38 +444,31 @@
   <!-- Modal Payment Section -->
   <div class="modal-overlay" id="paymentModal">
     <div class="modal-content">
-      <h3>Advance Prepayment Verification</h3>
+      <h3>Scan & Pay ₹1 Advance</h3>
       <div class="advance-tag">
-        <i class="fa-solid fa-shield-halved"></i> ₹1 Advance Payment
+        <i class="fa-solid fa-shield-halved"></i> ₹1 Advance Payment Required
       </div>
 
-      <!-- Unique Payment Reference Code Banner -->
-      <div class="ref-box">
-        Payment Note Code: <strong id="uniqueNoteDisplay">RHC-XXXX</strong>
-        <p style="font-size:11px; margin-top:3px; color:#dc3545;">⚠️ Payment Note/Remark me ye code likhna zaruri hai.</p>
-      </div>
-
-      <!-- Dynamic QR Code -->
+      <!-- Uploaded QR Code Image -->
       <div class="qr-container">
-        <img id="qrImage" src="" alt="UPI Payment QR Code">
+        <img src="qr-code.png" id="qrImage" alt="Rohitkumar3454@ybl UPI QR Code">
       </div>
 
       <!-- UPI ID with Copy Option -->
       <div class="upi-box">
-        <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">rohitkumar3454@ybl</span></div>
+        <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">Rohitkumar3454@ybl</span></div>
         <button class="copy-btn" onclick="copyUpiId()"><i class="fa-regular fa-copy"></i> Copy</button>
       </div>
 
-      <a id="directUpiBtn" href="#" class="pay-btn" target="_blank"><i class="fa-solid fa-mobile-screen"></i> Pay ₹1 via UPI App</a>
+      <a id="directUpiBtn" href="upi://pay?pa=Rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR" class="pay-btn" target="_blank">
+        <i class="fa-solid fa-mobile-screen"></i> Pay ₹1 via UPI App
+      </a>
 
-      <div style="text-align:left; margin-bottom:15px;">
-        <label style="font-size:12px; font-weight:600;">Payment ke baad 12-digit UTR daalein:</label>
-        <input type="text" id="transactionInput" maxlength="12" placeholder="Enter 12-digit UPI Transaction ID" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-top:5px;" required>
-      </div>
+      <p style="font-size:12px; color:#666; margin-bottom:15px;">Payment complete karne ke baad neeche <strong>Confirm & Complete Booking</strong> par click karein.</p>
 
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-confirm" id="confirmBtn" onclick="confirmBooking()">Confirm & Submit</button>
+        <button class="btn-confirm" id="confirmBtn" onclick="confirmBooking()">Complete & Confirm Booking</button>
       </div>
     </div>
   </div>
@@ -489,7 +480,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
@@ -504,20 +495,12 @@
     const db = getFirestore(app);
 
     window.currentBookingData = {};
-    window.generatedNoteCode = "";
 
     const bookingForm = document.getElementById("bookingForm");
     const paymentModal = document.getElementById("paymentModal");
-    const directUpiBtn = document.getElementById("directUpiBtn");
-    const qrImage = document.getElementById("qrImage");
-    const uniqueNoteDisplay = document.getElementById("uniqueNoteDisplay");
 
     bookingForm.addEventListener("submit", function(e) {
       e.preventDefault();
-
-      // Generate Unique Note Code
-      const randomNum = Math.floor(1000 + Math.random() * 9000);
-      window.generatedNoteCode = `RHC-${randomNum}`;
 
       window.currentBookingData = {
         name: document.getElementById("name").value.trim(),
@@ -525,19 +508,8 @@
         service: document.getElementById("service").value,
         date: document.getElementById("date").value,
         time: document.getElementById("time").value,
-        address: document.getElementById("address").value.trim(),
-        noteCode: window.generatedNoteCode
+        address: document.getElementById("address").value.trim()
       };
-
-      uniqueNoteDisplay.innerText = window.generatedNoteCode;
-
-      // Construct UPI String
-      const upiString = `upi://pay?pa=rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR&tn=${window.generatedNoteCode}`;
-      
-      directUpiBtn.href = upiString;
-
-      // Dynamic QR Code via Google API
-      qrImage.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(upiString)}`;
 
       paymentModal.style.display = "flex";
     });
@@ -549,40 +521,22 @@
     window.copyUpiId = function() {
       const upiId = document.getElementById("upiId").innerText;
       navigator.clipboard.writeText(upiId);
-      alert(`UPI ID Copied!\n\nPay karte waqt Note/Remarks me ye code zarur daalein: ${window.generatedNoteCode}`);
+      alert(`UPI ID Copied: Rohitkumar3454@ybl`);
     };
 
     window.confirmBooking = async function() {
-      const transactionInput = document.getElementById("transactionInput");
-      const transactionId = transactionInput.value.trim();
       const confirmBtn = document.getElementById("confirmBtn");
 
-      if (!transactionId || transactionId.length !== 12 || isNaN(transactionId)) {
-        alert("Kripya sahi 12-digit numeric UPI Transaction ID / UTR number enter karein.");
-        return;
-      }
-
       confirmBtn.disabled = true;
-      confirmBtn.innerText = "Verifying...";
+      confirmBtn.innerText = "Booking in Progress...";
 
       try {
-        // Check duplicate transaction ID
-        const q = query(collection(db, "appointments"), where("transactionId", "==", transactionId));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-          alert("❌ Ye Transaction ID pehle se use ho chuki hai!");
-          confirmBtn.disabled = false;
-          confirmBtn.innerText = "Confirm & Submit";
-          return;
-        }
-
-        // Save Data in Firebase
+        // Direct Save Data in Firebase
         const finalData = {
           ...window.currentBookingData,
           advanceAmount: 1,
-          transactionId: transactionId,
-          paymentStatus: "Completed",
+          upiId: "Rohitkumar3454@ybl",
+          paymentStatus: "Pending Verification",
           createdAt: serverTimestamp()
         };
 
@@ -592,20 +546,18 @@
 
         // Populate Slip Details
         document.getElementById("sRef").innerText = docRef.id;
-        document.getElementById("sNoteRef").innerText = finalData.noteCode;
         document.getElementById("sName").innerText = finalData.name;
         document.getElementById("sMobile").innerText = finalData.mobile;
         document.getElementById("sAddress").innerText = finalData.address;
         document.getElementById("sService").innerText = finalData.service;
         document.getElementById("sDate").innerText = finalData.date;
         document.getElementById("sTime").innerText = finalData.time;
-        document.getElementById("sTransaction").innerText = finalData.transactionId;
 
-        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Payment Note:* ${finalData.noteCode}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹1%0A*Transaction ID:* ${finalData.transactionId}`;
+        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹1`;
         
         document.getElementById("waContainer").innerHTML = `
           <a href="https://wa.me/916209103454?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
-            <i class="fa-brands fa-whatsapp"></i> Send Slip to Shopkeeper on WhatsApp
+            <i class="fa-brands fa-whatsapp"></i> Send Slip & Payment Screenshot to Shopkeeper
           </a>
         `;
 
@@ -613,14 +565,13 @@
         document.getElementById("slip").scrollIntoView({ behavior: 'smooth' });
 
         bookingForm.reset();
-        transactionInput.value = "";
 
       } catch (error) {
         console.error("Firebase Error: ", error);
         alert("Booking me error aayi: " + error.message);
       } finally {
         confirmBtn.disabled = false;
-        confirmBtn.innerText = "Confirm & Submit";
+        confirmBtn.innerText = "Complete & Confirm Booking";
       }
     };
   </script>
@@ -638,4 +589,5 @@
   </script>
 
 </body>
-</html>
+  </html>
+  
