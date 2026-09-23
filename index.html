@@ -129,10 +129,23 @@
       border-radius: 8px;
       font-size: 15px;
       outline: none;
+      background: #fff;
     }
 
     form input:focus, form select:focus {
       border-color: var(--primary-color);
+    }
+
+    /* DATE & TIME PLACEHOLDER CSS STYLING */
+    input[type="date"]:invalid::-webkit-datetime-edit,
+    input[type="time"]:invalid::-webkit-datetime-edit {
+      color: #757575;
+    }
+
+    input[type="date"]:before,
+    input[type="time"]:before {
+      color: #757575;
+      margin-right: 0.5em;
     }
 
     .full {
@@ -349,8 +362,12 @@
           <option value="Hair + Beard Combo">Hair + Beard Combo</option>
         </select>
 
-        <input type="date" id="date" required>
-        <input type="time" id="time" class="full" required>
+        <!-- DATE FIELD WITH PLACEHOLDER SUPPORT -->
+        <input type="date" id="date" placeholder="Select Appointment Date" required onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
+
+        <!-- TIME FIELD WITH PLACEHOLDER SUPPORT -->
+        <input type="time" id="time" class="full" placeholder="Select Appointment Time" required onfocus="(this.type='time')" onblur="if(!this.value)this.type='text'">
+
         <input type="text" id="address" class="full" placeholder="Address" required>
 
         <button type="submit" class="btn-submit full">Proceed to Booking & Payment</button>
@@ -428,7 +445,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-    // ⚠️ Apne Firebase Console se Ye Details Replace Karein
+    // ⚠️ Firebase Console se Apni Details Replace Karein
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -514,6 +531,11 @@
         sendEmailNotification(finalData, docRef.id);
 
         bookingForm.reset();
+        
+        // Reset Date & Time inputs back to text mode after reset
+        document.getElementById("date").type = 'text';
+        document.getElementById("time").type = 'text';
+        
         document.getElementById("transactionInput").value = "";
 
       } catch (error) {
@@ -531,6 +553,14 @@
   </script>
 
   <script>
+    // Initialize date and time fields as text initially to show placeholders
+    window.addEventListener('DOMContentLoaded', () => {
+      const dateInput = document.getElementById('date');
+      const timeInput = document.getElementById('time');
+      if (!dateInput.value) dateInput.type = 'text';
+      if (!timeInput.value) timeInput.type = 'text';
+    });
+
     function downloadSlip() {
       const slipElement = document.getElementById('slip');
       html2canvas(slipElement).then(canvas => {
