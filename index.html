@@ -176,6 +176,8 @@
       padding: 25px;
       text-align: center;
       animation: modalFadeIn 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
     }
 
     @keyframes modalFadeIn {
@@ -189,13 +191,29 @@
       padding: 8px 12px;
       border-radius: 6px;
       font-size: 13px;
-      margin: 10px 0 15px 0;
+      margin: 10px 0;
       display: inline-block;
       border: 1px solid #ffeeba;
     }
 
-    .qr-container {
+    .ref-box {
+      background: #e3f2fd;
+      border: 1px dashed #0d6efd;
+      padding: 10px;
+      border-radius: 8px;
       margin: 10px 0;
+      color: #084298;
+      font-size: 13px;
+    }
+
+    .ref-box strong {
+      font-size: 16px;
+      color: #0d6efd;
+      letter-spacing: 1px;
+    }
+
+    .qr-container {
+      margin: 5px 0;
       padding: 10px;
       background: #fafafa;
       border: 2px dashed #ddd;
@@ -204,26 +222,26 @@
     }
 
     .qr-container img {
-      width: 180px;
-      height: 180px;
+      width: 170px;
+      height: 170px;
       object-fit: contain;
     }
 
     .upi-box {
       background: #f1f3f5;
-      padding: 10px 14px;
+      padding: 8px 12px;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
     .copy-btn {
       background: #007bff;
       color: #fff;
       border: none;
-      padding: 6px 12px;
+      padding: 5px 10px;
       border-radius: 6px;
       font-size: 12px;
       cursor: pointer;
@@ -232,7 +250,7 @@
     .pay-options {
       display: flex;
       gap: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     .pay-btn {
@@ -381,6 +399,7 @@
         </div>
 
         <div class="slip-row"><strong>Booking ID:</strong> <span id="sRef"></span></div>
+        <div class="slip-row"><strong>Payment Note Ref:</strong> <span id="sNoteRef" style="color:#0d6efd; font-weight:bold;"></span></div>
         <div class="slip-row"><strong>Name:</strong> <span id="sName"></span></div>
         <div class="slip-row"><strong>Mobile:</strong> <span id="sMobile"></span></div>
         <div class="slip-row"><strong>Address:</strong> <span id="sAddress"></span></div>
@@ -407,24 +426,30 @@
   <!-- Modal Payment Section -->
   <div class="modal-overlay" id="paymentModal">
     <div class="modal-content">
-      <h3>Advance Prepayment</h3>
+      <h3>Advance Prepayment Verification</h3>
       <div class="advance-tag">
-        <i class="fa-solid fa-shield-halved"></i> ₹1 Service Charge (Shop bill me minus hoga)
+        <i class="fa-solid fa-shield-halved"></i> ₹1 Advance Payment
       </div>
 
-      <!-- QR Code -->
+      <!-- Unique Payment Reference Code Banner -->
+      <div class="ref-box">
+        Payment Note Code: <strong id="uniqueNoteDisplay">RHC-XXXX</strong>
+        <p style="font-size:11px; margin-top:3px; color:#dc3545;">⚠️ Payment App me Note / Remark me ye Code daalna zaruri hai.</p>
+      </div>
+
+      <!-- Dynamic QR Code -->
       <div class="qr-container">
-        <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=rohitkumar3454@ybl%26pn=Rohit%20Hair%20Cutting%26am=1%26cu=INR" alt="UPI Payment QR Code">
+        <img id="qrImage" src="" alt="UPI Payment QR Code">
       </div>
 
       <!-- UPI ID with Copy Option -->
       <div class="upi-box">
         <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">rohitkumar3454@ybl</span></div>
-        <button class="copy-btn" onclick="copyUpiId()"><i class="fa-regular fa-copy"></i> Copy</button>
+        <button class="copy-btn" onclick="copyUpiId()"><i class="fa-regular fa-copy"></i> Copy UPI</button>
       </div>
 
       <div class="pay-options">
-        <a id="directUpiBtn" href="#" class="pay-btn"><i class="fa-solid fa-mobile-screen"></i> Pay via App</a>
+        <a id="directUpiBtn" href="#" class="pay-btn"><i class="fa-solid fa-mobile-screen"></i> Pay via App (Auto Note)</a>
       </div>
 
       <div style="text-align:left; margin-bottom:15px;">
@@ -461,13 +486,20 @@
     const db = getFirestore(app);
 
     window.currentBookingData = {};
+    window.generatedNoteCode = "";
 
     const bookingForm = document.getElementById("bookingForm");
     const paymentModal = document.getElementById("paymentModal");
     const directUpiBtn = document.getElementById("directUpiBtn");
+    const qrImage = document.getElementById("qrImage");
+    const uniqueNoteDisplay = document.getElementById("uniqueNoteDisplay");
 
     bookingForm.addEventListener("submit", function(e) {
       e.preventDefault();
+
+      // Generate Unique Note Code (e.g., RHC-8492)
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      window.generatedNoteCode = `RHC-${randomNum}`;
 
       window.currentBookingData = {
         name: document.getElementById("name").value.trim(),
@@ -475,11 +507,17 @@
         service: document.getElementById("service").value,
         date: document.getElementById("date").value,
         time: document.getElementById("time").value,
-        address: document.getElementById("address").value.trim()
+        address: document.getElementById("address").value.trim(),
+        noteCode: window.generatedNoteCode
       };
 
-      const upiDeepLink = `upi://pay?pa=rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR`;
-      directUpiBtn.href = upiDeepLink;
+      uniqueNoteDisplay.innerText = window.generatedNoteCode;
+
+      // Embed Unique Note into UPI Deep Link & QR Code
+      const rawUpiUri = `upi://pay?pa=rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR&tn=${window.generatedNoteCode}`;
+      
+      directUpiBtn.href = rawUpiUri;
+      qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(rawUpiUri)}`;
 
       paymentModal.style.display = "flex";
     });
@@ -491,7 +529,7 @@
     window.copyUpiId = function() {
       const upiId = document.getElementById("upiId").innerText;
       navigator.clipboard.writeText(upiId);
-      alert("UPI ID Copied! Ab apne UPI app (PhonePe/GPay) me Pay to UPI ID karke ₹1 pay karein.");
+      alert(`UPI ID Copied!\n\nPay karte waqt Note/Remarks me code mandatory daalein: ${window.generatedNoteCode}`);
     };
 
     window.confirmBooking = async function() {
@@ -499,7 +537,7 @@
       const transactionId = transactionInput.value.trim();
       const confirmBtn = document.getElementById("confirmBtn");
 
-      // 1. Check if Transaction ID is 12 digits
+      // 1. Validation for 12 digits
       if (!transactionId || transactionId.length !== 12 || isNaN(transactionId)) {
         alert("Kripya sahi 12-digit numeric UPI Transaction ID / UTR number enter karein.");
         return;
@@ -509,18 +547,18 @@
       confirmBtn.innerText = "Verifying...";
 
       try {
-        // 2. Check Firestore if this Transaction ID is already used
+        // 2. Database Unique UTR Check
         const q = query(collection(db, "appointments"), where("transactionId", "==", transactionId));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          alert("❌ Ye Transaction ID pehle se use ho chuki hai!\nEk Transaction ID se do baar booking nahi ho sakti. Kripya new payment karein.");
+          alert("❌ Ye Transaction ID pehle se use ho chuki hai!\nEk Transaction ID se do baar booking nahi ho sakti.");
           confirmBtn.disabled = false;
           confirmBtn.innerText = "Confirm & Submit";
           return;
         }
 
-        // 3. Save new booking if unique
+        // 3. Save Appointment with Payment Note Ref
         const finalData = {
           ...window.currentBookingData,
           advanceAmount: 1,
@@ -534,6 +572,7 @@
         closeModal();
 
         document.getElementById("sRef").innerText = docRef.id;
+        document.getElementById("sNoteRef").innerText = finalData.noteCode;
         document.getElementById("sName").innerText = finalData.name;
         document.getElementById("sMobile").innerText = finalData.mobile;
         document.getElementById("sAddress").innerText = finalData.address;
@@ -542,7 +581,7 @@
         document.getElementById("sTime").innerText = finalData.time;
         document.getElementById("sTransaction").innerText = finalData.transactionId;
 
-        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹1%0A*Transaction ID:* ${finalData.transactionId}`;
+        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Payment Note:* ${finalData.noteCode}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹1%0A*Transaction ID:* ${finalData.transactionId}`;
         
         document.getElementById("waContainer").innerHTML = `
           <a href="https://wa.me/916209103454?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
@@ -570,31 +609,6 @@
     };
 
     function sendEmailNotification(data, refId) {
-      const subject = `New Appointment Confirmation - ${data.name}`;
-      const body = `New Booking Details:\n\nReference ID: ${refId}\nName: ${data.name}\nMobile: ${data.mobile}\nService: ${data.service}\nDate: ${data.date}\nTime: ${data.time}\nAdvance Paid: ₹1\nTransaction ID: ${data.transactionId}\nAddress: ${data.address}`;
-      
-      window.location.href = `mailto:rohitksharma3454@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
-  </script>
-
-  <script>
-    window.addEventListener('DOMContentLoaded', () => {
-      const dateInput = document.getElementById('date');
-      const timeInput = document.getElementById('time');
-      if (!dateInput.value) dateInput.type = 'text';
-      if (!timeInput.value) timeInput.type = 'text';
-    });
-
-    function downloadSlip() {
-      const slipElement = document.getElementById('slip');
-      html2canvas(slipElement).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'Appointment_Slip_RohitHairCutting.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
-  </script>
-
-</body>
-</html>
+      const subject = `New Appointment Confirmation - ${data.name} (${data.noteCode})`;
+      const body = `New Booking Details:\n\nReference ID: ${refId}\nPayment Note Ref: ${data.noteCode}\nName: ${data.name}\nMobile: ${data.mobile}\nService: ${data.service}\nDate: ${data.date}\nTime: ${data.time}\nAdvance Paid: ₹1\nTransaction ID: ${data.transactionId}\nAddress: ${data.address}`;
+  
