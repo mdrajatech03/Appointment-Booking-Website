@@ -14,7 +14,7 @@
 
   <style>
     :root {
-      --primary-color: #d4af37; /* Gold theme */
+      --primary-color: #d4af37;
       --secondary-color: #111111;
       --accent-color: #27ae60;
       --bg-color: #f8f9fa;
@@ -136,18 +136,6 @@
       border-color: var(--primary-color);
     }
 
-    /* DATE & TIME PLACEHOLDER CSS STYLING */
-    input[type="date"]:invalid::-webkit-datetime-edit,
-    input[type="time"]:invalid::-webkit-datetime-edit {
-      color: #757575;
-    }
-
-    input[type="date"]:before,
-    input[type="time"]:before {
-      color: #757575;
-      margin-right: 0.5em;
-    }
-
     .full {
       grid-column: 1 / -1;
     }
@@ -168,7 +156,6 @@
       background: #000;
     }
 
-    /* PAYMENT MODAL STYLES */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -259,7 +246,6 @@
     .btn-cancel { background: #e0e0e0; color: #333; }
     .btn-confirm { background: var(--accent-color); color: #fff; font-weight: 600; }
 
-    /* SLIP STYLES */
     .slip {
       display: none;
       margin-top: 35px;
@@ -362,10 +348,8 @@
           <option value="Hair + Beard Combo">Hair + Beard Combo</option>
         </select>
 
-        <!-- DATE FIELD WITH PLACEHOLDER SUPPORT -->
         <input type="date" id="date" placeholder="Select Appointment Date" required onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'">
 
-        <!-- TIME FIELD WITH PLACEHOLDER SUPPORT -->
         <input type="time" id="time" class="full" placeholder="Select Appointment Time" required onfocus="(this.type='time')" onblur="if(!this.value)this.type='text'">
 
         <input type="text" id="address" class="full" placeholder="Address" required>
@@ -373,7 +357,6 @@
         <button type="submit" class="btn-submit full">Proceed to Booking & Payment</button>
       </form>
 
-      <!-- APPOINTMENT SLIP -->
       <div class="slip" id="slip">
         <div class="slip-header">
           <h2 style="color:var(--primary-color);">Rohit Hair Cutting</h2>
@@ -397,7 +380,6 @@
 
         <button class="btn-download" onclick="downloadSlip()"><i class="fa-solid fa-file-arrow-down"></i> Download Slip Image</button>
 
-        <!-- Dynamic WhatsApp Link appended via JS -->
         <div id="waContainer"></div>
       </div>
 
@@ -405,7 +387,6 @@
 
   </div>
 
-  <!-- PAYMENT MODAL -->
   <div class="modal-overlay" id="paymentModal">
     <div class="modal-content">
       <h3>Advance Prepayment</h3>
@@ -414,7 +395,6 @@
       </div>
 
       <div class="qr-container">
-        <!-- Direct Dynamic UPI QR Code URL for ₹49 -->
         <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=rohitkumar3454@ybl%26pn=Rohit%20Hair%20Cutting%26am=49%26cu=INR" alt="UPI Payment QR Code">
       </div>
 
@@ -440,12 +420,11 @@
     © 2026 Rohit Hair Cutting | All Rights Reserved
   </footer>
 
-  <!-- FIREBASE INTEGRATION SCRIPT -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore.js";
 
-    // ⚠️ Firebase Console se Apni Details Replace Karein
+    // ⚠️ Is jagah apni Firebase Keys paste karein
     const firebaseConfig = {
       apiKey: "YOUR_API_KEY",
       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
@@ -516,7 +495,6 @@
         document.getElementById("sTime").innerText = finalData.time;
         document.getElementById("sTransaction").innerText = finalData.transactionId;
 
-        // Add 1-Click WhatsApp Send Button
         const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹49%0A*Transaction ID:* ${finalData.transactionId}`;
         
         document.getElementById("waContainer").innerHTML = `
@@ -531,11 +509,8 @@
         sendEmailNotification(finalData, docRef.id);
 
         bookingForm.reset();
-        
-        // Reset Date & Time inputs back to text mode after reset
         document.getElementById("date").type = 'text';
         document.getElementById("time").type = 'text';
-        
         document.getElementById("transactionInput").value = "";
 
       } catch (error) {
@@ -553,7 +528,6 @@
   </script>
 
   <script>
-    // Initialize date and time fields as text initially to show placeholders
     window.addEventListener('DOMContentLoaded', () => {
       const dateInput = document.getElementById('date');
       const timeInput = document.getElementById('time');
