@@ -32,6 +32,83 @@
       padding: 20px;
     }
 
+    /* Login Modal Styles */
+    .login-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .login-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      border-top: 4px solid var(--primary-color);
+    }
+
+    .login-card h2 {
+      margin-bottom: 8px;
+      font-size: 22px;
+      color: var(--secondary-color);
+    }
+
+    .login-card p {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 15px;
+      outline: none;
+    }
+
+    .login-card input:focus {
+      border-color: var(--primary-color);
+    }
+
+    .login-card button {
+      width: 100%;
+      padding: 12px;
+      background: var(--secondary-color);
+      color: var(--primary-color);
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .login-card button:hover {
+      background: #000;
+    }
+
+    .error-msg {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    /* Admin Content */
+    .admin-container {
+      display: none; /* Login hone ke baad visible hoga */
+    }
+
     .header {
       background: var(--secondary-color);
       color: #fff;
@@ -49,9 +126,27 @@
       color: var(--primary-color);
     }
 
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+
     .refresh-btn {
       background: var(--primary-color);
       color: #000;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logout-btn {
+      background: #dc3545;
+      color: #fff;
       border: none;
       padding: 10px 18px;
       border-radius: 8px;
@@ -134,43 +229,65 @@
 </head>
 <body>
 
-  <div class="header">
-    <h1><i class="fa-solid fa-user-shield"></i> Rohit Hair Cutting - Admin Panel</h1>
-    <button class="refresh-btn" onclick="fetchAppointments()">
-      <i class="fa-solid fa-rotate-right"></i> Refresh Data
-    </button>
+  <!-- Password Protected Screen -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <i class="fa-solid fa-lock fa-2x" style="color: var(--primary-color); margin-bottom: 12px;"></i>
+      <h2>Admin Login</h2>
+      <p>Rohit Hair Cutting Dashboard</p>
+
+      <form id="loginForm">
+        <input type="password" id="adminPassword" placeholder="Enter Admin Password" required autofocus>
+        <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+      </form>
+      <div class="error-msg" id="loginError">Incorrect Password! Try again.</div>
+    </div>
   </div>
 
-  <div class="table-container">
-    <table id="appointmentsTable">
-      <thead>
-        <tr>
-          <th>Booking ID</th>
-          <th>Name</th>
-          <th>Mobile</th>
-          <th>Service</th>
-          <th>Date</th>
-          <th>Time</th>
-          <th>Address</th>
-          <th>Advance Paid</th>
-          <th>Transaction ID</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <tr>
-          <td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- Protected Admin Dashboard Content -->
+  <div class="admin-container" id="adminContainer">
+    <div class="header">
+      <h1><i class="fa-solid fa-user-shield"></i> Rohit Hair Cutting - Admin Panel</h1>
+      <div class="header-actions">
+        <button class="refresh-btn" onclick="fetchAppointments()">
+          <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+        <button class="logout-btn" onclick="logoutAdmin()">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table id="appointmentsTable">
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Address</th>
+            <th>Advance Paid</th>
+            <th>Transaction ID</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr>
+            <td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Same Firebase Config as index.html
     const firebaseConfig = {
       apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
       authDomain: "rohit-hair-cutting.firebaseapp.com",
@@ -182,6 +299,38 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    const PASS_KEY = "rohithasmi@123";
+
+    const loginForm = document.getElementById("loginForm");
+    const loginOverlay = document.getElementById("loginOverlay");
+    const adminContainer = document.getElementById("adminContainer");
+    const loginError = document.getElementById("loginError");
+
+    // Login Check Event
+    loginForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const enteredPassword = document.getElementById("adminPassword").value.trim();
+
+      if (enteredPassword === PASS_KEY) {
+        sessionStorage.setItem("adminLoggedIn", "true");
+        unlockAdminPanel();
+      } else {
+        loginError.style.display = "block";
+        document.getElementById("adminPassword").value = "";
+      }
+    });
+
+    function unlockAdminPanel() {
+      loginOverlay.style.display = "none";
+      adminContainer.style.display = "block";
+      fetchAppointments();
+    }
+
+    window.logoutAdmin = function() {
+      sessionStorage.removeItem("adminLoggedIn");
+      location.reload();
+    };
 
     window.fetchAppointments = async function() {
       const tableBody = document.getElementById("tableBody");
@@ -242,9 +391,11 @@
       }
     };
 
-    // Initial Load
+    // Auto Login Check on Page Load
     window.addEventListener('DOMContentLoaded', () => {
-      fetchAppointments();
+      if (sessionStorage.getItem("adminLoggedIn") === "true") {
+        unlockAdminPanel();
+      }
     });
   </script>
 
