@@ -468,7 +468,7 @@
         <button class="copy-btn" onclick="copyUpiId()"><i class="fa-regular fa-copy"></i> Copy</button>
       </div>
 
-      <a id="directUpiBtn" href="#" class="pay-btn"><i class="fa-solid fa-mobile-screen"></i> Pay ₹1 via UPI App</a>
+      <a id="directUpiBtn" href="#" class="pay-btn" target="_blank"><i class="fa-solid fa-mobile-screen"></i> Pay ₹1 via UPI App</a>
 
       <div style="text-align:left; margin-bottom:15px;">
         <label style="font-size:12px; font-weight:600;">Payment ke baad 12-digit UTR daalein:</label>
@@ -515,7 +515,7 @@
     bookingForm.addEventListener("submit", function(e) {
       e.preventDefault();
 
-      // Generate Unique Note Code (e.g. RHC-8492)
+      // Generate Unique Note Code
       const randomNum = Math.floor(1000 + Math.random() * 9000);
       window.generatedNoteCode = `RHC-${randomNum}`;
 
@@ -531,12 +531,12 @@
 
       uniqueNoteDisplay.innerText = window.generatedNoteCode;
 
-      // Construct Standard UPI String
+      // Construct UPI String
       const upiString = `upi://pay?pa=rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR&tn=${window.generatedNoteCode}`;
       
       directUpiBtn.href = upiString;
 
-      // Generate QR Code using Google API
+      // Dynamic QR Code via Google API
       qrImage.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(upiString)}`;
 
       paymentModal.style.display = "flex";
@@ -557,7 +557,6 @@
       const transactionId = transactionInput.value.trim();
       const confirmBtn = document.getElementById("confirmBtn");
 
-      // 1. Validation for 12 digits
       if (!transactionId || transactionId.length !== 12 || isNaN(transactionId)) {
         alert("Kripya sahi 12-digit numeric UPI Transaction ID / UTR number enter karein.");
         return;
@@ -567,18 +566,18 @@
       confirmBtn.innerText = "Verifying...";
 
       try {
-        // 2. Database Unique UTR Check
+        // Check duplicate transaction ID
         const q = query(collection(db, "appointments"), where("transactionId", "==", transactionId));
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          alert("❌ Ye Transaction ID pehle se use ho chuki hai!\nEk Transaction ID se do baar booking nahi ho sakti.");
+          alert("❌ Ye Transaction ID pehle se use ho chuki hai!");
           confirmBtn.disabled = false;
           confirmBtn.innerText = "Confirm & Submit";
           return;
         }
 
-        // 3. Save Appointment
+        // Save Data in Firebase
         const finalData = {
           ...window.currentBookingData,
           advanceAmount: 1,
@@ -591,6 +590,7 @@
         
         closeModal();
 
+        // Populate Slip Details
         document.getElementById("sRef").innerText = docRef.id;
         document.getElementById("sNoteRef").innerText = finalData.noteCode;
         document.getElementById("sName").innerText = finalData.name;
@@ -612,8 +612,6 @@
         document.getElementById("slip").style.display = "block";
         document.getElementById("slip").scrollIntoView({ behavior: 'smooth' });
 
-        sendEmailNotification(finalData, docRef.id);
-
         bookingForm.reset();
         transactionInput.value = "";
 
@@ -625,7 +623,19 @@
         confirmBtn.innerText = "Confirm & Submit";
       }
     };
+  </script>
 
-    function sendEmailNotification(data, refId) {
-      const subject = `New Appointment Confirmation - ${data.name} (${data.noteCode})`;
-      const body = `New Booking Details:\n\nReference ID: ${refId}\nPayment Note Ref: ${data.noteCode}\nName: ${data.name}\nMobile: ${data.mobile}\nService: ${data.service}\nDate: ${data.date}\nTime: ${data.time}\nAdvance Paid: ₹1\nT
+  <script>
+    function downloadSlip() {
+      const slipElement = document.getElementById('slip');
+      html2canvas(slipElement).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Appointment_Slip_RohitHairCutting.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+
+</body>
+</html>
