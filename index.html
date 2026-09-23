@@ -428,13 +428,13 @@
       </div>
 
       <div style="text-align:left; margin-bottom:15px;">
-        <label style="font-size:12px; font-weight:600;">Payment ke baad UTR / Transaction ID daalein:</label>
-        <input type="text" id="transactionInput" placeholder="Enter 12-digit UPI Transaction ID" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-top:5px;" required>
+        <label style="font-size:12px; font-weight:600;">Payment ke baad 12-digit UTR daalein:</label>
+        <input type="text" id="transactionInput" maxlength="12" placeholder="Enter 12-digit UPI Transaction ID" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; margin-top:5px;" required>
       </div>
 
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-confirm" onclick="confirmBooking()">Confirm & Submit</button>
+        <button class="btn-confirm" id="confirmBtn" onclick="confirmBooking()">Confirm & Submit</button>
       </div>
     </div>
   </div>
@@ -446,7 +446,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
@@ -495,22 +495,40 @@
     };
 
     window.confirmBooking = async function() {
-      const transactionId = document.getElementById("transactionInput").value.trim();
+      const transactionInput = document.getElementById("transactionInput");
+      const transactionId = transactionInput.value.trim();
+      const confirmBtn = document.getElementById("confirmBtn");
 
-      if (!transactionId) {
-        alert("Kripya payment karne ke baad Transaction ID / UTR number enter karein.");
+      // 1. Check if Transaction ID is 12 digits
+      if (!transactionId || transactionId.length !== 12 || isNaN(transactionId)) {
+        alert("Kripya sahi 12-digit numeric UPI Transaction ID / UTR number enter karein.");
         return;
       }
 
-      const finalData = {
-        ...window.currentBookingData,
-        advanceAmount: 1,
-        transactionId: transactionId,
-        paymentStatus: "Completed",
-        createdAt: serverTimestamp()
-      };
+      confirmBtn.disabled = true;
+      confirmBtn.innerText = "Verifying...";
 
       try {
+        // 2. Check Firestore if this Transaction ID is already used
+        const q = query(collection(db, "appointments"), where("transactionId", "==", transactionId));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+          alert("❌ Ye Transaction ID pehle se use ho chuki hai!\nEk Transaction ID se do baar booking nahi ho sakti. Kripya new payment karein.");
+          confirmBtn.disabled = false;
+          confirmBtn.innerText = "Confirm & Submit";
+          return;
+        }
+
+        // 3. Save new booking if unique
+        const finalData = {
+          ...window.currentBookingData,
+          advanceAmount: 1,
+          transactionId: transactionId,
+          paymentStatus: "Completed",
+          createdAt: serverTimestamp()
+        };
+
         const docRef = await addDoc(collection(db, "appointments"), finalData);
         
         closeModal();
@@ -540,11 +558,14 @@
         bookingForm.reset();
         document.getElementById("date").type = 'text';
         document.getElementById("time").type = 'text';
-        document.getElementById("transactionInput").value = "";
+        transactionInput.value = "";
 
       } catch (error) {
         console.error("Firebase Error: ", error);
         alert("Booking me error aayi: " + error.message);
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = "Confirm & Submit";
       }
     };
 
