@@ -300,6 +300,55 @@
   </style>
 </head>
 
+  <!-- Firebase SDK Setup -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Aapki Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
+    authDomain: "rohit-hair-cutting.firebaseapp.com",
+    projectId: "rohit-hair-cutting",
+    storageBucket: "rohit-hair-cutting.firebasestorage.app",
+    messagingSenderId: "184279547945",
+    appId: "1:184279547945:web:0d94e94a532e9e02fc5c38"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Form submit event
+  const bookingForm = document.querySelector('form'); // apne form ki class/id ke hisab se change karein
+  if (bookingForm) {
+    bookingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Input values capture karein
+      const name = document.querySelector('#name').value;
+      const phone = document.querySelector('#phone').value;
+      const date = document.querySelector('#date').value;
+      const service = document.querySelector('#service').value;
+
+      try {
+        await addDoc(collection(db, "appointments"), {
+          name: name,
+          phone: phone,
+          date: date,
+          service: service,
+          createdAt: serverTimestamp()
+        });
+        alert("Appointment successful book ho gaya!");
+        bookingForm.reset();
+      } catch (error) {
+        console.error("Error booking appointment: ", error);
+        alert("Kuch error aaya, dobara try karein.");
+      }
+    });
+  }
+</script>
+  
+
 <body>
 
   <section class="hero">
