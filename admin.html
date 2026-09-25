@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard - Rohit Hair Cutting</title>
   
-  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 
   <style>
@@ -32,7 +30,6 @@
       padding: 20px;
     }
 
-    /* Login Modal Styles */
     .login-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -93,10 +90,6 @@
       cursor: pointer;
     }
 
-    .login-card button:hover {
-      background: #000;
-    }
-
     .error-msg {
       color: #dc3545;
       font-size: 12px;
@@ -104,7 +97,6 @@
       display: none;
     }
 
-    /* Admin Content */
     .admin-container {
       display: none;
     }
@@ -137,16 +129,12 @@
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-size: 14px;
     }
 
     .refresh-btn { background: var(--primary-color); color: #000; }
     .logout-btn { background: #dc3545; color: #fff; }
 
-    /* Control Tabs */
     .nav-tabs {
       display: flex;
       gap: 10px;
@@ -162,9 +150,6 @@
       font-weight: 600;
       cursor: pointer;
       color: #555;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .tab-btn.active {
@@ -193,9 +178,6 @@
       font-size: 18px;
       margin-bottom: 15px;
       color: var(--secondary-color);
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .form-grid {
@@ -216,7 +198,7 @@
       color: #555;
     }
 
-    .form-group input, .form-group select {
+    .form-group input {
       padding: 10px;
       border: 1px solid #ccc;
       border-radius: 8px;
@@ -233,9 +215,6 @@
       cursor: pointer;
       font-weight: 600;
       margin-top: 15px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .table-container {
@@ -313,46 +292,41 @@
 </head>
 <body>
 
-  <!-- Password Protected Screen -->
+  <!-- Password Overlay -->
   <div class="login-overlay" id="loginOverlay">
     <div class="login-card">
-      <i class="fa-solid fa-lock fa-2x" style="color: var(--primary-color); margin-bottom: 12px;"></i>
       <h2>Admin Login</h2>
       <p>Rohit Hair Cutting Dashboard</p>
 
       <form id="loginForm" onsubmit="handleAdminLogin(event)">
         <input type="password" id="adminPassword" placeholder="Enter Admin Password" required autofocus>
-        <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+        <button type="submit">Login</button>
       </form>
       <div class="error-msg" id="loginError">Incorrect Password! Try again.</div>
     </div>
   </div>
 
-  <!-- Protected Admin Dashboard Content -->
+  <!-- Protected Panel -->
   <div class="admin-container" id="adminContainer">
     <div class="header">
-      <h1><i class="fa-solid fa-user-shield"></i> Rohit Hair Cutting - Admin Panel</h1>
+      <h1>Rohit Hair Cutting - Admin Panel</h1>
       <div class="header-actions">
-        <button class="btn-action refresh-btn" onclick="fetchAppointments()">
-          <i class="fa-solid fa-rotate-right"></i> Refresh
-        </button>
-        <button class="btn-action logout-btn" onclick="logoutAdmin()">
-          <i class="fa-solid fa-right-from-bracket"></i> Logout
-        </button>
+        <button class="btn-action refresh-btn" onclick="fetchAppointments()">Refresh</button>
+        <button class="btn-action logout-btn" onclick="logoutAdmin()">Logout</button>
       </div>
     </div>
 
-    <!-- Navigation Tabs -->
+    <!-- Navigation Tabs (Dropdown Icons Completely Removed) -->
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('appointmentsTab', this)"><i class="fa-solid fa-calendar-check"></i> Appointments</button>
-      <button class="tab-btn" onclick="switchTab('servicesTab', this)"><i class="fa-solid fa-scissors"></i> Manage Services & Rates</button>
-      <button class="tab-btn" onclick="switchTab('profileTab', this)"><i class="fa-solid fa-user-gear"></i> Admin Profile & Password</button>
+      <button class="tab-btn active" onclick="switchTab('appointmentsTab', this)">Appointments</button>
+      <button class="tab-btn" onclick="switchTab('servicesTab', this)">Manage Services & Rates</button>
+      <button class="tab-btn" onclick="switchTab('profileTab', this)">Admin Profile & Password</button>
     </div>
 
     <!-- Tab 1: Appointments -->
     <div id="appointmentsTab" class="tab-content active">
       <div class="card-panel table-container">
-        <h2><i class="fa-solid fa-list"></i> Customer Bookings</h2>
+        <h2>Customer Bookings</h2>
         <table id="appointmentsTable">
           <thead>
             <tr>
@@ -381,7 +355,7 @@
     <!-- Tab 2: Manage Services & Rates -->
     <div id="servicesTab" class="tab-content">
       <div class="card-panel">
-        <h2><i class="fa-solid fa-circle-plus"></i> Add New Service</h2>
+        <h2>Add New Service</h2>
         <form id="addServiceForm" class="form-grid">
           <div class="form-group">
             <label>Service Name</label>
@@ -395,24 +369,14 @@
             <label>Description</label>
             <input type="text" id="serviceDesc" placeholder="e.g. Premium hair conditioning">
           </div>
-          <div class="form-group">
-            <label>Icon</label>
-            <select id="serviceIcon">
-              <option value="fa-scissors">Scissors</option>
-              <option value="fa-user-ninja">Beard / Razor</option>
-              <option value="fa-crown">Crown / Combo</option>
-              <option value="fa-spray-can">Spray / Wash</option>
-              <option value="fa-sparkles">Facial / Spa</option>
-            </select>
-          </div>
           <div style="grid-column: 1 / -1;">
-            <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Add Service</button>
+            <button type="submit" class="btn-save">Add Service</button>
           </div>
         </form>
       </div>
 
       <div class="card-panel table-container">
-        <h2><i class="fa-solid fa-sliders"></i> Active Services List</h2>
+        <h2>Active Services List</h2>
         <table>
           <thead>
             <tr>
@@ -432,7 +396,7 @@
     <!-- Tab 3: Profile & Password -->
     <div id="profileTab" class="tab-content">
       <div class="card-panel">
-        <h2><i class="fa-solid fa-key"></i> Change Admin Password</h2>
+        <h2>Change Admin Password</h2>
         <form id="changePasswordForm" class="form-grid">
           <div class="form-group">
             <label>Current Password</label>
@@ -443,13 +407,13 @@
             <input type="password" id="newPassword" required>
           </div>
           <div style="grid-column: 1 / -1;">
-            <button type="submit" class="btn-save"><i class="fa-solid fa-shield-halved"></i> Update Password</button>
+            <button type="submit" class="btn-save">Update Password</button>
           </div>
         </form>
       </div>
 
       <div class="card-panel">
-        <h2><i class="fa-solid fa-store"></i> Salon & Contact Details</h2>
+        <h2>Salon & Contact Details</h2>
         <form id="profileForm" class="form-grid">
           <div class="form-group">
             <label>Salon Name</label>
@@ -464,7 +428,7 @@
             <input type="email" id="shopEmail" value="rohitksharma3454@gmail.com" required>
           </div>
           <div style="grid-column: 1 / -1;">
-            <button type="submit" class="btn-save"><i class="fa-solid fa-floppy-disk"></i> Save Profile Settings</button>
+            <button type="submit" class="btn-save">Save Profile Settings</button>
           </div>
         </form>
       </div>
@@ -473,7 +437,6 @@
   </div>
 
   <script>
-    // Independent Login Script
     function getAdminPassword() {
       return localStorage.getItem("customAdminPass") || "rohithasmi@123";
     }
@@ -517,6 +480,7 @@
     });
   </script>
 
+  <!-- Corrected & Unbroken Firebase Module Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -539,7 +503,7 @@
       loadProfileSettings();
     };
 
-    // 1. APPOINTMENTS MANAGEMENT
+    // 1. APPOINTMENTS
     window.fetchAppointments = async function() {
       const tableBody = document.getElementById("tableBody");
       tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td></tr>`;
@@ -571,7 +535,7 @@
               <td><code>${data.transactionId || 'N/A'}</code></td>
               <td><span class="badge-paid">${data.paymentStatus || 'Completed'}</span></td>
               <td>
-                <button class="btn-edit" onclick="editAppointmentStatus('${docId}', '${data.paymentStatus || 'Completed'}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-edit" onclick="editAppointmentStatus('${docId}', '${data.paymentStatus || 'Completed'}')"><i class="fa-solid fa-pen"></i> Status</button>
                 <button class="btn-delete" onclick="deleteAppointment('${docId}')"><i class="fa-solid fa-trash"></i></button>
               </td>
             </tr>
@@ -611,13 +575,13 @@
       }
     };
 
-    // 2. SERVICES & RATES CONTROL
+    // 2. SERVICES
     window.fetchServices = async function() {
       const tbody = document.getElementById("servicesTableBody");
       try {
         const querySnapshot = await getDocs(collection(db, "services"));
         if (querySnapshot.empty) {
-          tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">Koi custom service add nahi hai. Default services display hongi.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">Koi custom service add nahi hai. Default display hongi.</td></tr>`;
           return;
         }
 
@@ -630,15 +594,15 @@
               <td>₹${s.price || 0}</td>
               <td>${s.desc || '-'}</td>
               <td>
-                <button class="btn-edit" onclick="editServiceRate('${docSnap.id}', ${s.price})"><i class="fa-solid fa-indian-rupee-sign"></i> Edit Rate</button>
-                <button class="btn-delete" onclick="deleteService('${docSnap.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+                <button class="btn-edit" onclick="editServiceRate('${docSnap.id}', ${s.price})">Edit Rate</button>
+                <button class="btn-delete" onclick="deleteService('${docSnap.id}')">Delete</button>
               </td>
             </tr>
           `;
         });
         tbody.innerHTML = html;
       } catch (e) {
-        console.error(e);
+        console.error("Error fetching services: ", e);
       }
     };
 
@@ -647,12 +611,62 @@
       const name = document.getElementById("serviceName").value.trim();
       const price = Number(document.getElementById("servicePrice").value);
       const desc = document.getElementById("serviceDesc").value.trim();
-      const icon = document.getElementById("serviceIcon").value;
 
       try {
-        await addDoc(collection(db, "services"), { name, price, desc, icon });
+        await addDoc(collection(db, "services"), { name, price, desc });
         alert("Nayi service add ho gayi!");
         document.getElementById("addServiceForm").reset();
         fetchServices();
       } catch (e) {
-        alert("Service 
+        alert("Service add nahi ho saki: " + e.message);
+      }
+    });
+
+    window.editServiceRate = async function(id, currentPrice) {
+      const newPrice = prompt("Naya rate/price enter karein (₹):", currentPrice);
+      if (newPrice !== null && newPrice !== "") {
+        try {
+          await updateDoc(doc(db, "services", id), { price: Number(newPrice) });
+          alert("Rate successfully update ho gaya!");
+          fetchServices();
+        } catch (e) {
+          alert("Update me error: " + e.message);
+        }
+      }
+    };
+
+    window.deleteService = async function(id) {
+      if (confirm("Service delete karna chahte hain?")) {
+        try {
+          await deleteDoc(doc(db, "services", id));
+          alert("Service delete ho gayi!");
+          fetchServices();
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
+      }
+    };
+
+    // 3. PROFILE & PASSWORD
+    window.loadProfileSettings = async function() {
+      try {
+        const docRef = doc(db, "settings", "profile");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const p = docSnap.data();
+          if (p.shopName) document.getElementById("shopName").value = p.shopName;
+          if (p.phone) document.getElementById("shopPhone").value = p.phone;
+          if (p.email) document.getElementById("shopEmail").value = p.email;
+        }
+      } catch (e) {
+        console.error("Profile load error: ", e);
+      }
+    };
+
+    document.getElementById("profileForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const shopName = document.getElementById("shopName").value.trim();
+      const phone = document.getElementById("shopPhone").value.trim();
+      const email = document.getElementById("shopEmail").value.trim();
+
+  
