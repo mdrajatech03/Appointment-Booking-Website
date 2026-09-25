@@ -320,7 +320,7 @@
       <h2>Admin Login</h2>
       <p>Rohit Hair Cutting Dashboard</p>
 
-      <form id="loginForm">
+      <form id="loginForm" onsubmit="handleAdminLogin(event)">
         <input type="password" id="adminPassword" placeholder="Enter Admin Password" required autofocus>
         <button type="submit"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
       </form>
@@ -472,6 +472,51 @@
 
   </div>
 
+  <script>
+    // Independent Login Script
+    function getAdminPassword() {
+      return localStorage.getItem("customAdminPass") || "rohithasmi@123";
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const enteredPassword = document.getElementById("adminPassword").value.trim();
+      const loginError = document.getElementById("loginError");
+
+      if (enteredPassword.toLowerCase() === getAdminPassword().toLowerCase()) {
+        sessionStorage.setItem("adminLoggedIn", "true");
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("adminContainer").style.display = "block";
+        
+        if(window.initFirebasePanel) {
+          window.initFirebasePanel();
+        }
+      } else {
+        loginError.style.display = "block";
+        document.getElementById("adminPassword").value = "";
+      }
+    }
+
+    function logoutAdmin() {
+      sessionStorage.removeItem("adminLoggedIn");
+      location.reload();
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      btn.classList.add("active");
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (sessionStorage.getItem("adminLoggedIn") === "true") {
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("adminContainer").style.display = "block";
+      }
+    });
+  </script>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -488,49 +533,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const DEFAULT_PASS = "rohithasmi@123";
-
-    function getAdminPassword() {
-      return localStorage.getItem("customAdminPass") || DEFAULT_PASS;
-    }
-
-    const loginForm = document.getElementById("loginForm");
-    const loginOverlay = document.getElementById("loginOverlay");
-    const adminContainer = document.getElementById("adminContainer");
-    const loginError = document.getElementById("loginError");
-
-    // Login Check Event
-    loginForm.addEventListener("submit", function(e) {
-      e.preventDefault();
-      const enteredPassword = document.getElementById("adminPassword").value.trim();
-
-      if (enteredPassword === getAdminPassword()) {
-        sessionStorage.setItem("adminLoggedIn", "true");
-        unlockAdminPanel();
-      } else {
-        loginError.style.display = "block";
-        document.getElementById("adminPassword").value = "";
-      }
-    });
-
-    function unlockAdminPanel() {
-      loginOverlay.style.display = "none";
-      adminContainer.style.display = "block";
+    window.initFirebasePanel = function() {
       fetchAppointments();
       fetchServices();
       loadProfileSettings();
-    }
-
-    window.logoutAdmin = function() {
-      sessionStorage.removeItem("adminLoggedIn");
-      location.reload();
-    };
-
-    window.switchTab = function(tabId, btn) {
-      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
-      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
-      document.getElementById(tabId).classList.add("active");
-      btn.classList.add("active");
     };
 
     // 1. APPOINTMENTS MANAGEMENT
@@ -649,10 +655,4 @@
         document.getElementById("addServiceForm").reset();
         fetchServices();
       } catch (e) {
-        alert("Service add karne me error: " + e.message);
-      }
-    });
-
-    window.editServiceRate = async function(id, oldPrice) {
-      const newPrice = prompt("Enter New Rate/Price in ₹:", oldPrice);
-      if (newPrice !== null && newPrice.trim() !== ""
+        alert("Service 
