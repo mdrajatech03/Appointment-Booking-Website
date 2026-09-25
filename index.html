@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Rohit Hair Cutting - Professional Appointment Booking</title>
   
-  <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-  <!-- HTML2Canvas Library for downloading slip -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <style>
@@ -338,15 +335,13 @@
   <div class="container">
 
     <h2 class="services-title">Our Services</h2>
-    <div class="cards" id="servicesCardsContainer">
-      <!-- Dynamic Services Cards Loaded from Firestore -->
-    </div>
+    <div class="cards" id="servicesCardsContainer"></div>
 
     <div class="booking-box">
       <h2>Book Appointment</h2>
 
       <div class="notice-banner">
-        <i class="fa-solid fa-circle-info"></i> <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹1 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹1 aapke final shop bill me se minus ho jayega.
+        <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹1 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹1 aapke final shop bill me se minus ho jayega.
       </div>
 
       <form id="bookingForm">
@@ -405,7 +400,7 @@
         <hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">
         <p style="font-size:11px; text-align:center; color:#555;"><strong>Contact:</strong> <span id="slipContact">6209103454</span> | <strong>Email:</strong> <span id="slipEmail">rohitksharma3454@gmail.com</span></p>
 
-        <button class="btn-download" onclick="downloadSlip()"><i class="fa-solid fa-file-arrow-down"></i> Download Slip Image</button>
+        <button class="btn-download" onclick="downloadSlip()">Download Slip Image</button>
 
         <div id="waContainer"></div>
       </div>
@@ -419,7 +414,7 @@
     <div class="modal-content">
       <h3>Scan & Pay ₹1 Advance</h3>
       <div class="advance-tag">
-        <i class="fa-solid fa-shield-halved"></i> ₹1 Advance Payment Required
+        ₹1 Advance Payment Required
       </div>
 
       <div class="qr-container">
@@ -428,14 +423,14 @@
 
       <div class="upi-box">
         <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">Rohitkumar3454@ybl</span></div>
-        <button class="copy-btn" onclick="copyUpiId()"><i class="fa-regular fa-copy"></i> Copy</button>
+        <button class="copy-btn" onclick="copyUpiId()">Copy</button>
       </div>
 
       <a id="directUpiBtn" href="upi://pay?pa=Rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR" class="pay-btn" target="_blank">
-        <i class="fa-solid fa-mobile-screen"></i> Pay ₹1 via UPI App
+        Pay ₹1 via UPI App
       </a>
 
-      <p style="font-size:12px; color:#666; margin-bottom:15px;">Payment complete karne ke baad neeche <strong>Confirm & Complete Booking</strong> par click karein.</p>
+      <p style="font-size:12px; color:#666; margin-bottom:15px;">Payment complete karne ke baad neeche <strong>Complete & Confirm Booking</strong> par click karein.</p>
 
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
@@ -471,10 +466,8 @@
     const bookingForm = document.getElementById("bookingForm");
     const paymentModal = document.getElementById("paymentModal");
 
-    // Load Dynamic Settings and Services from Admin Panel
     async function loadShopData() {
       try {
-        // Load Profile
         const profileDoc = await getDoc(doc(db, "settings", "profile"));
         if (profileDoc.exists()) {
           const p = profileDoc.data();
@@ -491,15 +484,14 @@
           }
         }
 
-        // Load Services
         const serviceSelect = document.getElementById("service");
         const cardsContainer = document.getElementById("servicesCardsContainer");
         const querySnapshot = await getDocs(collection(db, "services"));
 
         let defaultServices = [
-          { name: "Hair Cut", desc: "Professional haircutting & modern styling", price: 100, icon: "fa-scissors" },
-          { name: "Beard Cutting", desc: "Precision beard trimming & shaping", price: 50, icon: "fa-user-ninja" },
-          { name: "Hair + Beard Combo", desc: "Complete hair styling & beard grooming", price: 140, icon: "fa-crown" }
+          { name: "Hair Cut", desc: "Professional haircutting & modern styling", price: 100 },
+          { name: "Beard Cutting", desc: "Precision beard trimming & shaping", price: 50 },
+          { name: "Hair + Beard Combo", desc: "Complete hair styling & beard grooming", price: 140 }
         ];
 
         let servicesList = [];
@@ -512,16 +504,13 @@
           });
         }
 
-        // Render Cards & Select Options
         let cardsHtml = "";
         let selectHtml = '<option value="">Select Service</option>';
 
         servicesList.forEach(s => {
-          const icon = s.icon || "fa-scissors";
           const priceText = s.price ? `₹${s.price}` : "";
           cardsHtml += `
             <div class="card">
-              <i class="fa-solid ${icon} fa-2x" style="color:var(--primary-color); margin-bottom:8px;"></i>
               <h3>${s.name}</h3>
               <p>${s.desc || ''}</p>
               ${priceText ? `<div class="price">${priceText}</div>` : ''}
@@ -594,7 +583,7 @@
         
         document.getElementById("waContainer").innerHTML = `
           <a href="https://wa.me/91${shopPhone}?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
-            <i class="fa-brands fa-whatsapp"></i> Send Slip & Payment Screenshot to Shopkeeper
+            Send Slip & Payment Screenshot to Shopkeeper
           </a>
         `;
 
