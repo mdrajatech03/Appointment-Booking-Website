@@ -320,7 +320,7 @@
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('appointmentsTab', this)">Appointments</button>
       <button class="tab-btn" onclick="switchTab('servicesTab', this)">Manage Services & Rates</button>
-      <button class="tab-btn" onclick="switchTab('profileTab', this)">Admin Profile & Password</button>
+      <button class="tab-btn" onclick="switchTab('profileTab', this)">Admin Profile & Settings</button>
     </div>
 
     <!-- Tab 1: Appointments -->
@@ -338,7 +338,7 @@
               <th>Time</th>
               <th>Address</th>
               <th>Advance Paid</th>
-              <th>Transaction ID</th>
+              <th>Transaction / UTR ID</th>
               <th>Status</th>
               <th>Action</th>
             </tr>
@@ -393,7 +393,7 @@
       </div>
     </div>
 
-    <!-- Tab 3: Profile & Password -->
+    <!-- Tab 3: Profile & Settings -->
     <div id="profileTab" class="tab-content">
       <div class="card-panel">
         <h2>Change Admin Password</h2>
@@ -413,7 +413,7 @@
       </div>
 
       <div class="card-panel">
-        <h2>Salon & Contact Details</h2>
+        <h2>Salon & Advance Payment Settings</h2>
         <form id="profileForm" class="form-grid">
           <div class="form-group">
             <label>Salon Name</label>
@@ -426,6 +426,10 @@
           <div class="form-group">
             <label>Email Address</label>
             <input type="email" id="shopEmail" value="rohitksharma3454@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label>Advance Service Charge (₹)</label>
+            <input type="number" id="advanceAmountInput" value="1" min="1" placeholder="e.g. 1, 25, 30, 50" required>
           </div>
           <div style="grid-column: 1 / -1;">
             <button type="submit" class="btn-save">Save Profile Settings</button>
@@ -472,6 +476,20 @@
       btn.classList.add("active");
     }
 
+    document.getElementById("changePasswordForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const curr = document.getElementById("currPassword").value.trim();
+      const newPass = document.getElementById("newPassword").value.trim();
+
+      if (curr.toLowerCase() === getAdminPassword().toLowerCase()) {
+        localStorage.setItem("customAdminPass", newPass);
+        alert("Password successfully updated!");
+        document.getElementById("changePasswordForm").reset();
+      } else {
+        alert("Incorrect Current Password!");
+      }
+    });
+
     window.addEventListener('DOMContentLoaded', () => {
       if (sessionStorage.getItem("adminLoggedIn") === "true") {
         document.getElementById("loginOverlay").style.display = "none";
@@ -503,7 +521,7 @@
       loadProfileSettings();
     };
 
-    // 1. APPOINTMENTS (Simplified query to fix freeze issue)
+    // 1. APPOINTMENTS
     window.fetchAppointments = async function() {
       const tableBody = document.getElementById("tableBody");
       tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td></tr>`;
@@ -531,7 +549,7 @@
               <td>${data.time || 'N/A'}</td>
               <td>${data.address || 'N/A'}</td>
               <td><strong style="color:var(--accent-color);">₹${data.advanceAmount || 1}</strong></td>
-              <td><code>${data.transactionId || 'N/A'}</code></td>
+              <td><code style="background:#eee; padding:2px 6px; border-radius:4px;">${data.transactionId || 'N/A'}</code></td>
               <td><span class="badge-paid">${data.paymentStatus || 'Completed'}</span></td>
               <td>
                 <button class="btn-edit" onclick="editAppointmentStatus('${docId}', '${data.paymentStatus || 'Completed'}')"><i class="fa-solid fa-pen"></i> Status</button>
@@ -646,53 +664,7 @@
       }
     };
 
-    // 3. PROFILE & PASSWORD
+    // 3. PROFILE & SETTINGS
     window.loadProfileSettings = async function() {
       try {
-        const docRef = doc(db, "settings", "profile");
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const p = docSnap.data();
-          if (p.shopName) document.getElementById("shopName").value = p.shopName;
-          if (p.phone) document.getElementById("shopPhone").value = p.phone;
-          if (p.email) document.getElementById("shopEmail").value = p.email;
-        }
-      } catch (e) {
-        console.error("Profile load error: ", e);
-      }
-    };
-
-    document.getElementById("profileForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      const shopName = document.getElementById("shopName").value.trim();
-      const phone = document.getElementById("shopPhone").value.trim();
-      const email = document.getElementById("shopEmail").value.trim();
-
-      try {
-        await setDoc(doc(db, "settings", "profile"), { shopName, phone, email });
-        alert("Profile Settings Saved!");
-      } catch (e) {
-        alert("Error saving settings: " + e.message);
-      }
-    });
-
-    document.getElementById("changePasswordForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const curr = document.getElementById("currPassword").value.trim();
-      const newP = document.getElementById("newPassword").value.trim();
-
-      if (curr.toLowerCase() === getAdminPassword().toLowerCase()) {
-        localStorage.setItem("customAdminPass", newP);
-        alert("Admin Password Changed Successfully!");
-        document.getElementById("changePasswordForm").reset();
-      } else {
-        alert("Incorrect Current Password!");
-      }
-    });
-
-    if (sessionStorage.getItem("adminLoggedIn") === "true") {
-      window.initFirebasePanel();
-    }
-  </script>
-</body>
-</html>
+        const docRef = doc(db, "settings", "pro
