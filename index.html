@@ -93,6 +93,13 @@
       font-size: 12px;
     }
 
+    .card .price {
+      color: var(--accent-color);
+      font-weight: 700;
+      font-size: 15px;
+      margin-top: 6px;
+    }
+
     .booking-box {
       background: #fff;
       padding: 25px;
@@ -201,21 +208,6 @@
       margin: 8px 0;
       display: inline-block;
       border: 1px solid #ffeeba;
-    }
-
-    .ref-box {
-      background: #e3f2fd;
-      border: 1px dashed #0d6efd;
-      padding: 10px;
-      border-radius: 8px;
-      margin: 8px 0;
-      color: #084298;
-      font-size: 13px;
-    }
-
-    .ref-box strong {
-      font-size: 16px;
-      color: #0d6efd;
     }
 
     .qr-container {
@@ -339,35 +331,19 @@
 <body>
 
   <section class="hero">
-    <h1>Rohit Hair Cutting</h1>
-    <p>Professional Hair & Beard Grooming Salon</p>
+    <h1 id="heroTitle">Rohit Hair Cutting</h1>
+    <p id="heroSubtitle">Professional Hair & Beard Grooming Salon</p>
   </section>
 
   <div class="container">
 
     <h2 class="services-title">Our Services</h2>
-    <div class="cards">
-      <div class="card">
-        <i class="fa-solid fa-scissors fa-2x" style="color:var(--primary-color); margin-bottom:8px;"></i>
-        <h3>Hair Cut</h3>
-        <p>Professional haircutting & modern styling</p>
-      </div>
-
-      <div class="card">
-        <i class="fa-solid fa-user-ninja fa-2x" style="color:var(--primary-color); margin-bottom:8px;"></i>
-        <h3>Beard Cutting</h3>
-        <p>Precision beard trimming & shaping</p>
-      </div>
-
-      <div class="card">
-        <i class="fa-solid fa-crown fa-2x" style="color:var(--primary-color); margin-bottom:8px;"></i>
-        <h3>Hair + Beard Combo</h3>
-        <p>Complete hair styling & beard grooming</p>
-      </div>
+    <div class="cards" id="servicesCardsContainer">
+      <!-- Dynamic Services Cards Loaded from Firestore -->
     </div>
 
     <div class="booking-box">
-      ## Book Appointment
+      <h2>Book Appointment</h2>
 
       <div class="notice-banner">
         <i class="fa-solid fa-circle-info"></i> <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹1 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹1 aapke final shop bill me se minus ho jayega.
@@ -388,9 +364,6 @@
           <label>Select Service</label>
           <select id="service" required>
             <option value="">Select Service</option>
-            <option value="Hair Cut">Hair Cut</option>
-            <option value="Beard Cutting">Beard Cutting</option>
-            <option value="Hair + Beard Combo">Hair + Beard Combo</option>
           </select>
         </div>
 
@@ -414,7 +387,7 @@
 
       <div class="slip" id="slip">
         <div class="slip-header">
-          <h2 style="color:var(--primary-color);">Rohit Hair Cutting</h2>
+          <h2 style="color:var(--primary-color);" id="slipShopName">Rohit Hair Cutting</h2>
           <p style="font-size:12px; color:#666;">Appointment Confirmation Slip</p>
         </div>
 
@@ -430,7 +403,7 @@
         <div class="slip-row"><strong style="color:#d9534f;">Shop Note:</strong> <span>₹1 bill me se minus ho jayega</span></div>
 
         <hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">
-        <p style="font-size:11px; text-align:center; color:#555;"><strong>Contact:</strong> 6209103454 | <strong>Email:</strong> rohitksharma3454@gmail.com</p>
+        <p style="font-size:11px; text-align:center; color:#555;"><strong>Contact:</strong> <span id="slipContact">6209103454</span> | <strong>Email:</strong> <span id="slipEmail">rohitksharma3454@gmail.com</span></p>
 
         <button class="btn-download" onclick="downloadSlip()"><i class="fa-solid fa-file-arrow-down"></i> Download Slip Image</button>
 
@@ -449,12 +422,10 @@
         <i class="fa-solid fa-shield-halved"></i> ₹1 Advance Payment Required
       </div>
 
-      <!-- Uploaded QR Code Image -->
       <div class="qr-container">
         <img src="qr-code.png" id="qrImage" alt="Rohitkumar3454@ybl UPI QR Code">
       </div>
 
-      <!-- UPI ID with Copy Option -->
       <div class="upi-box">
         <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">Rohitkumar3454@ybl</span></div>
         <button class="copy-btn" onclick="copyUpiId()"><i class="fa-regular fa-copy"></i> Copy</button>
@@ -480,7 +451,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, getDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
@@ -495,9 +466,77 @@
     const db = getFirestore(app);
 
     window.currentBookingData = {};
+    let shopPhone = "6209103454";
 
     const bookingForm = document.getElementById("bookingForm");
     const paymentModal = document.getElementById("paymentModal");
+
+    // Load Dynamic Settings and Services from Admin Panel
+    async function loadShopData() {
+      try {
+        // Load Profile
+        const profileDoc = await getDoc(doc(db, "settings", "profile"));
+        if (profileDoc.exists()) {
+          const p = profileDoc.data();
+          if (p.shopName) {
+            document.getElementById("heroTitle").innerText = p.shopName;
+            document.getElementById("slipShopName").innerText = p.shopName;
+          }
+          if (p.phone) {
+            shopPhone = p.phone;
+            document.getElementById("slipContact").innerText = p.phone;
+          }
+          if (p.email) {
+            document.getElementById("slipEmail").innerText = p.email;
+          }
+        }
+
+        // Load Services
+        const serviceSelect = document.getElementById("service");
+        const cardsContainer = document.getElementById("servicesCardsContainer");
+        const querySnapshot = await getDocs(collection(db, "services"));
+
+        let defaultServices = [
+          { name: "Hair Cut", desc: "Professional haircutting & modern styling", price: 100, icon: "fa-scissors" },
+          { name: "Beard Cutting", desc: "Precision beard trimming & shaping", price: 50, icon: "fa-user-ninja" },
+          { name: "Hair + Beard Combo", desc: "Complete hair styling & beard grooming", price: 140, icon: "fa-crown" }
+        ];
+
+        let servicesList = [];
+
+        if (querySnapshot.empty) {
+          servicesList = defaultServices;
+        } else {
+          querySnapshot.forEach((docSnap) => {
+            servicesList.push({ id: docSnap.id, ...docSnap.data() });
+          });
+        }
+
+        // Render Cards & Select Options
+        let cardsHtml = "";
+        let selectHtml = '<option value="">Select Service</option>';
+
+        servicesList.forEach(s => {
+          const icon = s.icon || "fa-scissors";
+          const priceText = s.price ? `₹${s.price}` : "";
+          cardsHtml += `
+            <div class="card">
+              <i class="fa-solid ${icon} fa-2x" style="color:var(--primary-color); margin-bottom:8px;"></i>
+              <h3>${s.name}</h3>
+              <p>${s.desc || ''}</p>
+              ${priceText ? `<div class="price">${priceText}</div>` : ''}
+            </div>
+          `;
+          selectHtml += `<option value="${s.name}${priceText ? ' ('+priceText+')' : ''}">${s.name} ${priceText ? '- '+priceText : ''}</option>`;
+        });
+
+        cardsContainer.innerHTML = cardsHtml;
+        serviceSelect.innerHTML = selectHtml;
+
+      } catch(e) {
+        console.error("Error loading shop data:", e);
+      }
+    }
 
     bookingForm.addEventListener("submit", function(e) {
       e.preventDefault();
@@ -531,12 +570,11 @@
       confirmBtn.innerText = "Booking in Progress...";
 
       try {
-        // Direct Save Data in Firebase
         const finalData = {
           ...window.currentBookingData,
           advanceAmount: 1,
           upiId: "Rohitkumar3454@ybl",
-          paymentStatus: "Pending Verification",
+          paymentStatus: "Completed",
           createdAt: serverTimestamp()
         };
 
@@ -544,7 +582,6 @@
         
         closeModal();
 
-        // Populate Slip Details
         document.getElementById("sRef").innerText = docRef.id;
         document.getElementById("sName").innerText = finalData.name;
         document.getElementById("sMobile").innerText = finalData.mobile;
@@ -556,7 +593,7 @@
         const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹1`;
         
         document.getElementById("waContainer").innerHTML = `
-          <a href="https://wa.me/916209103454?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
+          <a href="https://wa.me/91${shopPhone}?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
             <i class="fa-brands fa-whatsapp"></i> Send Slip & Payment Screenshot to Shopkeeper
           </a>
         `;
@@ -574,6 +611,8 @@
         confirmBtn.innerText = "Complete & Confirm Booking";
       }
     };
+
+    window.addEventListener('DOMContentLoaded', loadShopData);
   </script>
 
   <script>
@@ -589,5 +628,4 @@
   </script>
 
 </body>
-  </html>
-  
+</html>
