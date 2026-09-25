@@ -256,6 +256,28 @@
       text-align: center;
     }
 
+    .utr-group {
+      text-align: left;
+      margin-bottom: 15px;
+    }
+
+    .utr-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #333;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .utr-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
     .modal-actions {
       display: flex;
       gap: 10px;
@@ -341,7 +363,7 @@
       <h2>Book Appointment</h2>
 
       <div class="notice-banner">
-        <strong>Important Note:</strong> Slot confirm karne ke liye <strong>₹1 Advance Service Charge</strong> pay karna compulsory hai. Ye ₹1 aapke final shop bill me se minus ho jayega.
+        <strong>Important Note:</strong> Slot confirm karne ke liye <strong id="noticeAdvanceText">₹1 Advance Service Charge</strong> pay karna compulsory hai. Ye advance amount aapke final shop bill me se minus ho jayega.
       </div>
 
       <form id="bookingForm">
@@ -393,9 +415,10 @@
         <div class="slip-row"><strong>Service:</strong> <span id="sService"></span></div>
         <div class="slip-row"><strong>Date:</strong> <span id="sDate"></span></div>
         <div class="slip-row"><strong>Time:</strong> <span id="sTime"></span></div>
+        <div class="slip-row"><strong>Transaction / UTR ID:</strong> <span id="sUtr" style="font-family:monospace;"></span></div>
         <hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">
-        <div class="slip-row"><strong>Advance Payment:</strong> <span style="color:var(--accent-color); font-weight:bold;">₹1 (Confirmed)</span></div>
-        <div class="slip-row"><strong style="color:#d9534f;">Shop Note:</strong> <span>₹1 bill me se minus ho jayega</span></div>
+        <div class="slip-row"><strong>Advance Payment:</strong> <span style="color:var(--accent-color); font-weight:bold;" id="sAdvancePaid">₹1 (Confirmed)</span></div>
+        <div class="slip-row"><strong style="color:#d9534f;">Shop Note:</strong> <span>Advance bill me se minus ho jayega</span></div>
 
         <hr style="margin:10px 0; border:0; border-top:1px dashed #ccc;">
         <p style="font-size:11px; text-align:center; color:#555;"><strong>Contact:</strong> <span id="slipContact">6209103454</span> | <strong>Email:</strong> <span id="slipEmail">rohitksharma3454@gmail.com</span></p>
@@ -412,29 +435,34 @@
   <!-- Modal Payment Section -->
   <div class="modal-overlay" id="paymentModal">
     <div class="modal-content">
-      <h3>Scan & Pay ₹1 Advance</h3>
-      <div class="advance-tag">
+      <h3 id="modalTitle">Scan & Pay ₹1 Advance</h3>
+      <div class="advance-tag" id="modalAdvanceTag">
         ₹1 Advance Payment Required
       </div>
 
       <div class="qr-container">
-        <img src="qr-code.png" id="qrImage" alt="Rohitkumar3454@ybl UPI QR Code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D6209103454%40okbizaxis%26pn%3DRohit%2520Hair%2520Cutting%26am%3D1%26cu%3DINR" id="qrImage" alt="UPI QR Code">
       </div>
 
       <div class="upi-box">
-        <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">Rohitkumar3454@ybl</span></div>
+        <div><strong style="font-size:12px;">UPI ID:</strong> <span id="upiId" style="color:#007bff; font-weight:600;">6209103454@okbizaxis</span></div>
         <button class="copy-btn" onclick="copyUpiId()">Copy</button>
       </div>
 
-      <a id="directUpiBtn" href="upi://pay?pa=Rohitkumar3454@ybl&pn=Rohit%20Hair%20Cutting&am=1&cu=INR" class="pay-btn" target="_blank">
-        Pay ₹1 via UPI App
+      <a id="directUpiBtn" href="upi://pay?pa=6209103454@okbizaxis&pn=Rohit%20Hair%20Cutting&am=1&cu=INR" class="pay-btn" target="_blank">
+        Pay via UPI App
       </a>
 
-      <p style="font-size:12px; color:#666; margin-bottom:15px;">Payment complete karne ke baad neeche <strong>Complete & Confirm Booking</strong> par click karein.</p>
+      <div class="utr-group">
+        <label for="transactionIdInput">Enter 12-digit UTR / Payment Transaction ID <span style="color:red;">*</span></label>
+        <input type="text" id="transactionIdInput" placeholder="e.g. 426819028341" required>
+      </div>
+
+      <p style="font-size:11px; color:#666; margin-bottom:15px;">Payment karne ke baad UTR ID zaroor darj karein bina iske booking confirm nahi hogi.</p>
 
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-        <button class="btn-confirm" id="confirmBtn" onclick="confirmBooking()">Complete & Confirm Booking</button>
+        <button class="btn-confirm" id="confirmBtn" onclick="confirmBooking()">Verify & Confirm Booking</button>
       </div>
     </div>
   </div>
@@ -462,9 +490,16 @@
 
     window.currentBookingData = {};
     let shopPhone = "6209103454";
+    let advanceAmount = 1;
+    let currentUpi = "6209103454@okbizaxis";
 
     const bookingForm = document.getElementById("bookingForm");
     const paymentModal = document.getElementById("paymentModal");
+
+    // Restrict Past Date Selection
+    const dateInput = document.getElementById("date");
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.setAttribute("min", today);
 
     async function loadShopData() {
       try {
@@ -482,7 +517,22 @@
           if (p.email) {
             document.getElementById("slipEmail").innerText = p.email;
           }
+          if (p.advanceAmount !== undefined && p.advanceAmount !== "") {
+            advanceAmount = Number(p.advanceAmount);
+          }
         }
+
+        // Update Advance Payment Displays Dynamic
+        document.getElementById("noticeAdvanceText").innerText = `₹${advanceAmount} Advance Service Charge`;
+        document.getElementById("modalTitle").innerText = `Scan & Pay ₹${advanceAmount} Advance`;
+        document.getElementById("modalAdvanceTag").innerText = `₹${advanceAmount} Advance Payment Required`;
+        
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi%3A%2F%2Fpay%3Fpa%3D${encodeURIComponent(currentUpi)}%26pn%3DRohit%2520Hair%2520Cutting%26am%3D${advanceAmount}%26cu%3DINR`;
+        document.getElementById("qrImage").src = qrUrl;
+
+        const upiPayDeepLink = `upi://pay?pa=${currentUpi}&pn=Rohit%20Hair%20Cutting&am=${advanceAmount}&cu=INR`;
+        document.getElementById("directUpiBtn").setAttribute("href", upiPayDeepLink);
+        document.getElementById("directUpiBtn").innerText = `Pay ₹${advanceAmount} via UPI App`;
 
         const serviceSelect = document.getElementById("service");
         const cardsContainer = document.getElementById("servicesCardsContainer");
@@ -530,15 +580,22 @@
     bookingForm.addEventListener("submit", function(e) {
       e.preventDefault();
 
+      const selectedDate = document.getElementById("date").value;
+      if (selectedDate < today) {
+        alert("Purani tareekh (Past Date) me booking karna allowed nahi hai.");
+        return;
+      }
+
       window.currentBookingData = {
         name: document.getElementById("name").value.trim(),
         mobile: document.getElementById("mobile").value.trim(),
         service: document.getElementById("service").value,
-        date: document.getElementById("date").value,
+        date: selectedDate,
         time: document.getElementById("time").value,
         address: document.getElementById("address").value.trim()
       };
 
+      document.getElementById("transactionIdInput").value = "";
       paymentModal.style.display = "flex";
     });
 
@@ -549,20 +606,27 @@
     window.copyUpiId = function() {
       const upiId = document.getElementById("upiId").innerText;
       navigator.clipboard.writeText(upiId);
-      alert(`UPI ID Copied: Rohitkumar3454@ybl`);
+      alert(`UPI ID Copied: ${upiId}`);
     };
 
     window.confirmBooking = async function() {
-      const confirmBtn = document.getElementById("confirmBtn");
+      const transactionId = document.getElementById("transactionIdInput").value.trim();
 
+      if (!transactionId || transactionId.length < 6) {
+        alert("Kripya sahi 12-digit UPI UTR / Transaction ID enter karein. Bina payment ke booking confirm nahi hogi.");
+        return;
+      }
+
+      const confirmBtn = document.getElementById("confirmBtn");
       confirmBtn.disabled = true;
       confirmBtn.innerText = "Booking in Progress...";
 
       try {
         const finalData = {
           ...window.currentBookingData,
-          advanceAmount: 1,
-          upiId: "Rohitkumar3454@ybl",
+          advanceAmount: advanceAmount,
+          upiId: currentUpi,
+          transactionId: transactionId,
           paymentStatus: "Completed",
           createdAt: serverTimestamp()
         };
@@ -578,43 +642,7 @@
         document.getElementById("sService").innerText = finalData.service;
         document.getElementById("sDate").innerText = finalData.date;
         document.getElementById("sTime").innerText = finalData.time;
+        document.getElementById("sUtr").innerText = finalData.transactionId;
+        document.getElementById("sAdvancePaid").innerText = `₹${finalData.advanceAmount} (Confirmed)`;
 
-        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹1`;
-        
-        document.getElementById("waContainer").innerHTML = `
-          <a href="https://wa.me/91${shopPhone}?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
-            Send Slip & Payment Screenshot to Shopkeeper
-          </a>
-        `;
-
-        document.getElementById("slip").style.display = "block";
-        document.getElementById("slip").scrollIntoView({ behavior: 'smooth' });
-
-        bookingForm.reset();
-
-      } catch (error) {
-        console.error("Firebase Error: ", error);
-        alert("Booking me error aayi: " + error.message);
-      } finally {
-        confirmBtn.disabled = false;
-        confirmBtn.innerText = "Complete & Confirm Booking";
-      }
-    };
-
-    window.addEventListener('DOMContentLoaded', loadShopData);
-  </script>
-
-  <script>
-    function downloadSlip() {
-      const slipElement = document.getElementById('slip');
-      html2canvas(slipElement).then(canvas => {
-        const link = document.createElement('a');
-        link.download = 'Appointment_Slip_RohitHairCutting.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      });
-    }
-  </script>
-
-</body>
-</html>
+        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${fi
