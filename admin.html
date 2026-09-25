@@ -106,7 +106,7 @@
 
     /* Admin Content */
     .admin-container {
-      display: none; /* Login hone ke baad visible hoga */
+      display: none;
     }
 
     .header {
@@ -131,9 +131,7 @@
       gap: 10px;
     }
 
-    .refresh-btn {
-      background: var(--primary-color);
-      color: #000;
+    .btn-action {
       border: none;
       padding: 10px 18px;
       border-radius: 8px;
@@ -142,26 +140,105 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      font-size: 14px;
     }
 
-    .logout-btn {
-      background: #dc3545;
-      color: #fff;
-      border: none;
-      padding: 10px 18px;
+    .refresh-btn { background: var(--primary-color); color: #000; }
+    .logout-btn { background: #dc3545; color: #fff; }
+
+    /* Control Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 12px 20px;
+      background: #fff;
+      border: 1px solid #ddd;
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
+      color: #555;
       display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn.active {
+      background: var(--secondary-color);
+      color: var(--primary-color);
+      border-color: var(--secondary-color);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .card-panel {
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+      margin-bottom: 25px;
+    }
+
+    .card-panel h2 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    .form-group input, .form-group select {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .btn-save {
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 15px;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
     }
 
     .table-container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
       overflow-x: auto;
     }
 
@@ -208,8 +285,15 @@
       font-size: 12px;
     }
 
-    .btn-delete:hover {
-      background: #bd2130;
+    .btn-edit {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      margin-right: 5px;
     }
 
     .empty-msg {
@@ -249,44 +333,148 @@
     <div class="header">
       <h1><i class="fa-solid fa-user-shield"></i> Rohit Hair Cutting - Admin Panel</h1>
       <div class="header-actions">
-        <button class="refresh-btn" onclick="fetchAppointments()">
+        <button class="btn-action refresh-btn" onclick="fetchAppointments()">
           <i class="fa-solid fa-rotate-right"></i> Refresh
         </button>
-        <button class="logout-btn" onclick="logoutAdmin()">
+        <button class="btn-action logout-btn" onclick="logoutAdmin()">
           <i class="fa-solid fa-right-from-bracket"></i> Logout
         </button>
       </div>
     </div>
 
-    <div class="table-container">
-      <table id="appointmentsTable">
-        <thead>
-          <tr>
-            <th>Booking ID</th>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Service</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Address</th>
-            <th>Advance Paid</th>
-            <th>Transaction ID</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <tr>
-            <td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Navigation Tabs -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchTab('appointmentsTab', this)"><i class="fa-solid fa-calendar-check"></i> Appointments</button>
+      <button class="tab-btn" onclick="switchTab('servicesTab', this)"><i class="fa-solid fa-scissors"></i> Manage Services & Rates</button>
+      <button class="tab-btn" onclick="switchTab('profileTab', this)"><i class="fa-solid fa-user-gear"></i> Admin Profile & Password</button>
     </div>
+
+    <!-- Tab 1: Appointments -->
+    <div id="appointmentsTab" class="tab-content active">
+      <div class="card-panel table-container">
+        <h2><i class="fa-solid fa-list"></i> Customer Bookings</h2>
+        <table id="appointmentsTable">
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Name</th>
+              <th>Mobile</th>
+              <th>Service</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Address</th>
+              <th>Advance Paid</th>
+              <th>Transaction ID</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 2: Manage Services & Rates -->
+    <div id="servicesTab" class="tab-content">
+      <div class="card-panel">
+        <h2><i class="fa-solid fa-circle-plus"></i> Add New Service</h2>
+        <form id="addServiceForm" class="form-grid">
+          <div class="form-group">
+            <label>Service Name</label>
+            <input type="text" id="serviceName" placeholder="e.g. Hair Wash & Style" required>
+          </div>
+          <div class="form-group">
+            <label>Rate / Price (₹)</label>
+            <input type="number" id="servicePrice" placeholder="e.g. 150" required>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" id="serviceDesc" placeholder="e.g. Premium hair conditioning">
+          </div>
+          <div class="form-group">
+            <label>Icon</label>
+            <select id="serviceIcon">
+              <option value="fa-scissors">Scissors</option>
+              <option value="fa-user-ninja">Beard / Razor</option>
+              <option value="fa-crown">Crown / Combo</option>
+              <option value="fa-spray-can">Spray / Wash</option>
+              <option value="fa-sparkles">Facial / Spa</option>
+            </select>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <button type="submit" class="btn-save"><i class="fa-solid fa-plus"></i> Add Service</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card-panel table-container">
+        <h2><i class="fa-solid fa-sliders"></i> Active Services List</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Service Name</th>
+              <th>Price (₹)</th>
+              <th>Description</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="servicesTableBody">
+            <tr><td colspan="4" class="empty-msg">Loading services...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tab 3: Profile & Password -->
+    <div id="profileTab" class="tab-content">
+      <div class="card-panel">
+        <h2><i class="fa-solid fa-key"></i> Change Admin Password</h2>
+        <form id="changePasswordForm" class="form-grid">
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" id="currPassword" required>
+          </div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" id="newPassword" required>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <button type="submit" class="btn-save"><i class="fa-solid fa-shield-halved"></i> Update Password</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card-panel">
+        <h2><i class="fa-solid fa-store"></i> Salon & Contact Details</h2>
+        <form id="profileForm" class="form-grid">
+          <div class="form-group">
+            <label>Salon Name</label>
+            <input type="text" id="shopName" value="Rohit Hair Cutting" required>
+          </div>
+          <div class="form-group">
+            <label>WhatsApp / Mobile Number</label>
+            <input type="tel" id="shopPhone" value="6209103454" required>
+          </div>
+          <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" id="shopEmail" value="rohitksharma3454@gmail.com" required>
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <button type="submit" class="btn-save"><i class="fa-solid fa-floppy-disk"></i> Save Profile Settings</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
@@ -300,7 +488,11 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const PASS_KEY = "rohithasmi@123";
+    const DEFAULT_PASS = "rohithasmi@123";
+
+    function getAdminPassword() {
+      return localStorage.getItem("customAdminPass") || DEFAULT_PASS;
+    }
 
     const loginForm = document.getElementById("loginForm");
     const loginOverlay = document.getElementById("loginOverlay");
@@ -312,7 +504,7 @@
       e.preventDefault();
       const enteredPassword = document.getElementById("adminPassword").value.trim();
 
-      if (enteredPassword === PASS_KEY) {
+      if (enteredPassword === getAdminPassword()) {
         sessionStorage.setItem("adminLoggedIn", "true");
         unlockAdminPanel();
       } else {
@@ -325,6 +517,8 @@
       loginOverlay.style.display = "none";
       adminContainer.style.display = "block";
       fetchAppointments();
+      fetchServices();
+      loadProfileSettings();
     }
 
     window.logoutAdmin = function() {
@@ -332,6 +526,14 @@
       location.reload();
     };
 
+    window.switchTab = function(tabId, btn) {
+      document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(el => el.classList.remove("active"));
+      document.getElementById(tabId).classList.add("active");
+      btn.classList.add("active");
+    };
+
+    // 1. APPOINTMENTS MANAGEMENT
     window.fetchAppointments = async function() {
       const tableBody = document.getElementById("tableBody");
       tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td></tr>`;
@@ -363,9 +565,8 @@
               <td><code>${data.transactionId || 'N/A'}</code></td>
               <td><span class="badge-paid">${data.paymentStatus || 'Completed'}</span></td>
               <td>
-                <button class="btn-delete" onclick="deleteAppointment('${docId}')">
-                  <i class="fa-solid fa-trash"></i> Delete
-                </button>
+                <button class="btn-edit" onclick="editAppointmentStatus('${docId}', '${data.paymentStatus || 'Completed'}')"><i class="fa-solid fa-pen"></i></button>
+                <button class="btn-delete" onclick="deleteAppointment('${docId}')"><i class="fa-solid fa-trash"></i></button>
               </td>
             </tr>
           `;
@@ -376,6 +577,19 @@
       } catch (error) {
         console.error("Error fetching data: ", error);
         tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg" style="color:red;">Data load karne me error aayi: ${error.message}</td></tr>`;
+      }
+    };
+
+    window.editAppointmentStatus = async function(id, currentStatus) {
+      const newStatus = prompt("Enter new status (Completed / Pending / Cancelled):", currentStatus);
+      if (newStatus && newStatus !== currentStatus) {
+        try {
+          await updateDoc(doc(db, "appointments", id), { paymentStatus: newStatus });
+          alert("Status Updated Successfully!");
+          fetchAppointments();
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
       }
     };
 
@@ -391,13 +605,54 @@
       }
     };
 
-    // Auto Login Check on Page Load
-    window.addEventListener('DOMContentLoaded', () => {
-      if (sessionStorage.getItem("adminLoggedIn") === "true") {
-        unlockAdminPanel();
+    // 2. SERVICES & RATES CONTROL
+    window.fetchServices = async function() {
+      const tbody = document.getElementById("servicesTableBody");
+      try {
+        const querySnapshot = await getDocs(collection(db, "services"));
+        if (querySnapshot.empty) {
+          tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">Koi custom service add nahi hai. Default services display hongi.</td></tr>`;
+          return;
+        }
+
+        let html = "";
+        querySnapshot.forEach(docSnap => {
+          const s = docSnap.data();
+          html += `
+            <tr>
+              <td><strong>${s.name}</strong></td>
+              <td>₹${s.price || 0}</td>
+              <td>${s.desc || '-'}</td>
+              <td>
+                <button class="btn-edit" onclick="editServiceRate('${docSnap.id}', ${s.price})"><i class="fa-solid fa-indian-rupee-sign"></i> Edit Rate</button>
+                <button class="btn-delete" onclick="deleteService('${docSnap.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+              </td>
+            </tr>
+          `;
+        });
+        tbody.innerHTML = html;
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    document.getElementById("addServiceForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const name = document.getElementById("serviceName").value.trim();
+      const price = Number(document.getElementById("servicePrice").value);
+      const desc = document.getElementById("serviceDesc").value.trim();
+      const icon = document.getElementById("serviceIcon").value;
+
+      try {
+        await addDoc(collection(db, "services"), { name, price, desc, icon });
+        alert("Nayi service add ho gayi!");
+        document.getElementById("addServiceForm").reset();
+        fetchServices();
+      } catch (e) {
+        alert("Service add karne me error: " + e.message);
       }
     });
-  </script>
 
-</body>
-</html>
+    window.editServiceRate = async function(id, oldPrice) {
+      const newPrice = prompt("Enter New Rate/Price in ₹:", oldPrice);
+      if (newPrice !== null && newPrice.trim() !== ""
