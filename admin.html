@@ -664,7 +664,44 @@
       }
     };
 
-    // 3. PROFILE & SETTINGS
+       // 3. PROFILE & SETTINGS
+    
     window.loadProfileSettings = async function() {
       try {
-        const docRef = doc(db, "settings", "pro
+        const docRef = doc(db, "settings", "profile");
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const p = docSnap.data();
+          if (p.shopName) document.getElementById("shopName").value = p.shopName;
+          if (p.phone) document.getElementById("shopPhone").value = p.phone;
+          if (p.email) document.getElementById("shopEmail").value = p.email;
+          if (p.advanceAmount !== undefined) document.getElementById("advanceAmountInput").value = p.advanceAmount;
+        }
+      } catch (e) {
+        console.error("Profile load error: ", e);
+      }
+    };
+
+    document.getElementById("profileForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const shopName = document.getElementById("shopName").value.trim();
+      const phone = document.getElementById("shopPhone").value.trim();
+      const email = document.getElementById("shopEmail").value.trim();
+      const advanceAmount = Number(document.getElementById("advanceAmountInput").value);
+
+      try {
+        await setDoc(doc(db, "settings", "profile"), { 
+          shopName, 
+          phone, 
+          email, 
+          advanceAmount 
+        }, { merge: true });
+
+        alert("Profile Settings successfully save ho gayi!");
+      } catch (e) {
+        alert("Settings save karne me error aaya: " + e.message);
+      }
+    });
+  </script>
+</body>
+</html>
