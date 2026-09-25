@@ -316,7 +316,7 @@
       </div>
     </div>
 
-    <!-- Navigation Tabs (Dropdown Icons Completely Removed) -->
+    <!-- Navigation Tabs -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('appointmentsTab', this)">Appointments</button>
       <button class="tab-btn" onclick="switchTab('servicesTab', this)">Manage Services & Rates</button>
@@ -480,10 +480,10 @@
     });
   </script>
 
-  <!-- Corrected & Unbroken Firebase Module Script -->
+  <!-- Firebase Module Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, getDoc, setDoc, addDoc, deleteDoc, updateDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyB1F8o158Z4cT3_QGrfCNCXp5qeHNbh6J0",
@@ -503,17 +503,16 @@
       loadProfileSettings();
     };
 
-    // 1. APPOINTMENTS
+    // 1. APPOINTMENTS (Simplified query to fix freeze issue)
     window.fetchAppointments = async function() {
       const tableBody = document.getElementById("tableBody");
       tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg"><i class="fa-solid fa-spinner fa-spin"></i> Loading Appointments...</td></tr>`;
 
       try {
-        const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(collection(db, "appointments"));
 
         if (querySnapshot.empty) {
-          tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg">Koi new appointment nahi mila.</td></tr>`;
+          tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg">Database me koi booking data nahi hai. Pehle ek test booking karein.</td></tr>`;
           return;
         }
 
@@ -545,8 +544,8 @@
         tableBody.innerHTML = html;
 
       } catch (error) {
-        console.error("Error fetching data: ", error);
-        tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg" style="color:red;">Data load karne me error aayi: ${error.message}</td></tr>`;
+        console.error("Firestore Error:", error);
+        tableBody.innerHTML = `<tr><td colspan="11" class="empty-msg" style="color:red; font-weight:bold;">Firebase Error: ${error.message}</td></tr>`;
       }
     };
 
@@ -669,4 +668,31 @@
       const phone = document.getElementById("shopPhone").value.trim();
       const email = document.getElementById("shopEmail").value.trim();
 
-  
+      try {
+        await setDoc(doc(db, "settings", "profile"), { shopName, phone, email });
+        alert("Profile Settings Saved!");
+      } catch (e) {
+        alert("Error saving settings: " + e.message);
+      }
+    });
+
+    document.getElementById("changePasswordForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const curr = document.getElementById("currPassword").value.trim();
+      const newP = document.getElementById("newPassword").value.trim();
+
+      if (curr.toLowerCase() === getAdminPassword().toLowerCase()) {
+        localStorage.setItem("customAdminPass", newP);
+        alert("Admin Password Changed Successfully!");
+        document.getElementById("changePasswordForm").reset();
+      } else {
+        alert("Incorrect Current Password!");
+      }
+    });
+
+    if (sessionStorage.getItem("adminLoggedIn") === "true") {
+      window.initFirebasePanel();
+    }
+  </script>
+</body>
+</html>
