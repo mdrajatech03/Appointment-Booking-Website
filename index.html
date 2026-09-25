@@ -645,4 +645,42 @@
         document.getElementById("sUtr").innerText = finalData.transactionId;
         document.getElementById("sAdvancePaid").innerText = `₹${finalData.advanceAmount} (Confirmed)`;
 
-        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${fi
+        const whatsappMsg = `Hi Rohit Hair Cutting, maine appointment book kar diya hai.%0A%0A*Booking ID:* ${docRef.id}%0A*Name:* ${finalData.name}%0A*Mobile:* ${finalData.mobile}%0A*Service:* ${finalData.service}%0A*Date:* ${finalData.date}%0A*Time:* ${finalData.time}%0A*Advance Paid:* ₹${finalData.advanceAmount}%0A*Transaction ID:* ${finalData.transactionId}`;
+        
+        document.getElementById("waContainer").innerHTML = `
+          <a href="https://wa.me/91${shopPhone}?text=${whatsappMsg}" target="_blank" style="display:block; text-align:center; background:#25D366; color:white; padding:12px; border-radius:8px; font-weight:bold; text-decoration:none; margin-top:12px; font-size:14px;">
+            Send Slip & Payment Screenshot to Shopkeeper
+          </a>
+        `;
+
+        document.getElementById("slip").style.display = "block";
+        document.getElementById("slip").scrollIntoView({ behavior: 'smooth' });
+
+        bookingForm.reset();
+
+      } catch (error) {
+        console.error("Firebase Error: ", error);
+        alert("Booking me error aayi: " + error.message);
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.innerText = "Verify & Confirm Booking";
+      }
+    };
+
+    window.addEventListener('DOMContentLoaded', loadShopData);
+  </script>
+
+  <script>
+    function downloadSlip() {
+      const slipElement = document.getElementById('slip');
+      html2canvas(slipElement).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Appointment_Slip_RohitHairCutting.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
+  </script>
+
+</body>
+</html>
